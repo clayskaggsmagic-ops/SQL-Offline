@@ -473,30 +473,28 @@
         // ============================================
         const lessons = {
             1: {
-                title: "SQL Lesson 1: SELECT Queries Introduction",
+                title: "SQL Lesson 1: SELECT queries 101",
                 db: "movies",
                 content: `
-                    <h3>What is SQL?</h3>
-                    <p>SQL, or Structured Query Language, is a language designed to allow both technical and non-technical users to query, manipulate, and transform data from a relational database.</p>
+                    <p>To retrieve data from a SQL database, we need to write <code>SELECT</code> statements, which are often colloquially refered to as <em>queries</em>. A query in itself is just a statement which declares what data we are looking for, where to find it in the database, and optionally, how to transform it before it is returned.</p>
 
-                    <h3>Relational Databases</h3>
-                    <p>A relational database represents a collection of related tables. Each table has a fixed number of named columns and any number of rows of data.</p>
+                    <p>It has a specific syntax though, which is what we are going to learn in this first lesson.</p>
 
-                    <h3>SELECT Queries</h3>
-                    <p>To retrieve data from a SQL database, we use <code>SELECT</code> statements, often called queries. A query declares what data we are looking for, where to find it, and optionally how to transform it.</p>
+                    <p>As we mentioned in the introduction, you can think of a table in SQL as a type of an entity (ie. Dogs), and each row in that table as a specific <em>instance</em> of that type (ie. A pug, a beagle, a different colored pug, etc). This means that the columns would then represent the common properties shared by all instances of that entity (ie. Color of fur, length of tail, etc).</p>
 
-                    <h3>Selecting Specific Columns</h3>
-                    <div class="syntax-box">SELECT column, another_column, ... FROM table_name;</div>
-                    <p>The result will be a table with only the columns you selected.</p>
+                    <h3>Select query for a specific columns</h3>
+                    <div class="syntax-box">SELECT column, another_column, ...
+FROM mytable;</div>
 
-                    <h3>Selecting All Columns</h3>
-                    <div class="syntax-box">SELECT * FROM table_name;</div>
-                    <p>The asterisk (*) is a shortcut to select all columns.</p>
+                    <p>The result of this query will be a two-dimensional set of rows and columns, effectively a copy of the table, but only with the columns that we requested.</p>
 
-                    <div class="data-preview">
-                        <h4>Movies Table</h4>
-                        <p>For this lesson, you'll be working with a table of Pixar movies:</p>
-                    </div>
+                    <h3>Select query for all columns</h3>
+                    <div class="syntax-box">SELECT *
+FROM mytable;</div>
+
+                    <p>If we want to retrieve absolutely all the columns of data from a table, we can then use the asterisk (<code>*</code>) shorthand in place of listing all the column names individually.</p>
+
+                    <p>This query, in particular, is really useful because it's a simple way to inspect a table by dumping all the data at once.</p>
                 `,
                 exercises: [
                     "Find the <code>title</code> of each film",
@@ -507,68 +505,67 @@
                 ]
             },
             2: {
-                title: "SQL Lesson 2: Queries with Constraints (Part 1)",
+                title: "SQL Lesson 2: Queries with constraints (Pt. 1)",
                 db: "movies",
                 content: `
-                    <h3>Filtering Results with WHERE</h3>
-                    <p>To filter certain rows from being returned, we use a <code>WHERE</code> clause. The clause is applied to each row of data by checking specific column values.</p>
+                    <p>Now we know how to select for specific columns of data from a table, but if you had a table with a hundred million rows of data, reading through all the rows would be inefficient and perhaps even impossible.</p>
 
+                    <p>In order to filter certain results from being returned, we need to use a <code>WHERE</code> clause in the query. The clause is applied to each row of data by checking specific column values to determine whether it should be included in the results or not.</p>
+
+                    <h3>Select query with constraints</h3>
                     <div class="syntax-box">SELECT column, another_column, ...
-FROM table_name
+FROM mytable
 WHERE condition
     AND/OR another_condition
     AND/OR ...;</div>
 
-                    <h3>Numeric Operators</h3>
+                    <p>More complex clauses can be constructed by joining numerous <code>AND</code> or <code>OR</code> logical keywords (ie. num_wheels >= 4 AND doors <= 2). And below are some useful operators that you can use for numerical data (ie. integer or floating point):</p>
+
                     <table class="operator-table">
                         <tr><th>Operator</th><th>Condition</th><th>SQL Example</th></tr>
-                        <tr><td><code>=, !=, &lt;, &lt;=, &gt;, &gt;=</code></td><td>Standard numerical operators</td><td><code>col != 4</code></td></tr>
-                        <tr><td><code>BETWEEN ... AND ...</code></td><td>Number within range (inclusive)</td><td><code>col BETWEEN 1.5 AND 10.5</code></td></tr>
-                        <tr><td><code>NOT BETWEEN ... AND ...</code></td><td>Number NOT within range</td><td><code>col NOT BETWEEN 1 AND 10</code></td></tr>
-                        <tr><td><code>IN (...)</code></td><td>Number exists in a list</td><td><code>col IN (2, 4, 6)</code></td></tr>
-                        <tr><td><code>NOT IN (...)</code></td><td>Number NOT in a list</td><td><code>col NOT IN (1, 3, 5)</code></td></tr>
+                        <tr><td><code>=, !=, &lt;, &lt;=, &gt;, &gt;=</code></td><td>Standard numerical operators</td><td><code>col_name != 4</code></td></tr>
+                        <tr><td><code>BETWEEN ... AND ...</code></td><td>Number is within range of two values (inclusive)</td><td><code>col_name BETWEEN 1.5 AND 10.5</code></td></tr>
+                        <tr><td><code>NOT BETWEEN ... AND ...</code></td><td>Number is not within range of two values (inclusive)</td><td><code>col_name NOT BETWEEN 1 AND 10</code></td></tr>
+                        <tr><td><code>IN (...)</code></td><td>Number exists in a list</td><td><code>col_name IN (2, 4, 6)</code></td></tr>
+                        <tr><td><code>NOT IN (...)</code></td><td>Number does not exist in a list</td><td><code>col_name NOT IN (1, 3, 5)</code></td></tr>
                     </table>
 
-                    <h3>Combining Conditions</h3>
-                    <p>You can combine multiple conditions using <code>AND</code> or <code>OR</code>:</p>
-                    <div class="syntax-box">SELECT * FROM movies WHERE year >= 2000 AND year <= 2010;</div>
+                    <p>In addition to making the results more manageable to understand, writing clauses to constrain the set of rows returned also allows the query to run faster due to the reduction in unnecessary data being returned.</p>
+
+                    <div class="warning-box">
+                        <strong>Did you know?</strong> SQL doesn't <em>require</em> you to write the keywords all capitalized, but as a convention, it helps people distinguish SQL keywords from column and tables names, and makes the query easier to read.
+                    </div>
                 `,
                 exercises: [
                     "Find the movie with a row <code>id</code> of 6",
-                    "Find the movies released in the years <code>BETWEEN</code> 2000 and 2010",
-                    "Find the movies <strong>NOT</strong> released in the years between 2000 and 2010",
+                    "Find the movies released in the <code>year</code>s between 2000 and 2010",
+                    "Find the movies <strong>not</strong> released in the <code>year</code>s between 2000 and 2010",
                     "Find the first 5 Pixar movies and their release <code>year</code>"
                 ]
             },
             3: {
-                title: "SQL Lesson 3: Queries with Constraints (Part 2)",
+                title: "SQL Lesson 3: Queries with constraints (Pt. 2)",
                 db: "movies",
                 content: `
-                    <h3>Text/String Operators</h3>
-                    <p>When working with text data, SQL provides special operators for pattern matching and comparison:</p>
+                    <p>When writing <code>WHERE</code> clauses with columns containing text data, SQL supports a number of useful operators to do things like case-insensitive string comparison and wildcard pattern matching. We show a few common text-data specific operators below:</p>
 
                     <table class="operator-table">
                         <tr><th>Operator</th><th>Condition</th><th>Example</th></tr>
-                        <tr><td><code>=</code></td><td>Case sensitive exact match</td><td><code>col = "abc"</code></td></tr>
-                        <tr><td><code>!= or &lt;&gt;</code></td><td>Case sensitive inequality</td><td><code>col != "xyz"</code></td></tr>
-                        <tr><td><code>LIKE</code></td><td>Case insensitive match</td><td><code>col LIKE "ABC"</code></td></tr>
-                        <tr><td><code>NOT LIKE</code></td><td>Case insensitive non-match</td><td><code>col NOT LIKE "xyz"</code></td></tr>
-                        <tr><td><code>%</code></td><td>Match sequence of 0+ characters (wildcard)</td><td><code>col LIKE "%AT%"</code> matches "CAT", "BAT", "AT"</td></tr>
-                        <tr><td><code>_</code></td><td>Match a single character (wildcard)</td><td><code>col LIKE "AN_"</code> matches "AND" not "AN"</td></tr>
-                        <tr><td><code>IN (...)</code></td><td>String in list</td><td><code>col IN ("A", "B", "C")</code></td></tr>
-                        <tr><td><code>NOT IN (...)</code></td><td>String NOT in list</td><td><code>col NOT IN ("X", "Y")</code></td></tr>
+                        <tr><td><code>=</code></td><td>Case sensitive exact string comparison (<em>notice the single equals</em>)</td><td><code>col_name = "abc"</code></td></tr>
+                        <tr><td><code>!= or &lt;&gt;</code></td><td>Case sensitive exact string inequality comparison</td><td><code>col_name != "abcd"</code></td></tr>
+                        <tr><td><code>LIKE</code></td><td>Case insensitive exact string comparison</td><td><code>col_name LIKE "ABC"</code></td></tr>
+                        <tr><td><code>NOT LIKE</code></td><td>Case insensitive exact string inequality comparison</td><td><code>col_name NOT LIKE "ABCD"</code></td></tr>
+                        <tr><td><code>%</code></td><td>Used anywhere in a string to match a sequence of zero or more characters (only with LIKE or NOT LIKE)</td><td><code>col_name LIKE "%AT%"</code> (matches "AT", "ATTIC", "CAT" or even "BATS")</td></tr>
+                        <tr><td><code>_</code></td><td>Used anywhere in a string to match a single character (only with LIKE or NOT LIKE)</td><td><code>col_name LIKE "AN_"</code> (matches "AND", but not "AN")</td></tr>
+                        <tr><td><code>IN (...)</code></td><td>String exists in a list</td><td><code>col_name IN ("A", "B", "C")</code></td></tr>
+                        <tr><td><code>NOT IN (...)</code></td><td>String does not exist in a list</td><td><code>col_name NOT IN ("D", "E", "F")</code></td></tr>
                     </table>
 
                     <div class="warning-box">
-                        <strong>Important:</strong> All strings must be quoted so the query parser can distinguish them from SQL keywords!
+                        <strong>Did you know?</strong> All strings must be quoted so that the query parser can distinguish words in the string from SQL keywords.
                     </div>
 
-                    <h3>Pattern Matching Examples</h3>
-                    <div class="syntax-box">-- Find movies starting with "Toy"
-SELECT * FROM movies WHERE title LIKE "Toy%";
-
--- Find movies with exactly 4-letter titles
-SELECT * FROM movies WHERE title LIKE "____";</div>
+                    <p>We should note that while most database implementations are quite efficient when using these operators, full-text search is best left to dedicated libraries like <a href="https://lucene.apache.org/">Apache Lucene</a> or <a href="http://sphinxsearch.com/">Sphinx</a>. These libraries are designed specifically to do full text search, and as a result are more efficient and can support a wider variety of search features including internationalization and advanced queries.</p>
                 `,
                 exercises: [
                     "Find all the Toy Story movies",
@@ -578,31 +575,46 @@ SELECT * FROM movies WHERE title LIKE "____";</div>
                 ]
             },
             4: {
-                title: "SQL Lesson 4: Filtering and Sorting Query Results",
+                title: "SQL Lesson 4: Filtering and sorting Query results",
                 db: "movies",
                 content: `
-                    <h3>Removing Duplicates with DISTINCT</h3>
-                    <p>SQL provides the <code>DISTINCT</code> keyword to remove duplicate rows from results:</p>
+                    <p>Even though the data in a database may be unique, the results of any particular query may not be – take our Movies table for example, many different movies can be released the same year. In such cases, SQL provides a convenient way to discard rows that have a duplicate column value by using the <code>DISTINCT</code> keyword.</p>
+
+                    <h3>Select query with unique results</h3>
                     <div class="syntax-box">SELECT DISTINCT column, another_column, ...
-FROM table_name
+FROM mytable
 WHERE condition(s);</div>
 
-                    <h3>Ordering Results</h3>
-                    <p>Use <code>ORDER BY</code> to sort results by a column in ascending (<code>ASC</code>) or descending (<code>DESC</code>) order:</p>
+                    <p>Since the <code>DISTINCT</code> keyword will blindly remove duplicate rows, we will learn in a future lesson how to discard duplicates based on specific columns using grouping and the <code>GROUP BY</code> clause.</p>
+
+                    <h3>Ordering results</h3>
+                    <p>Unlike our neatly ordered table in the last few lessons, most data in real databases are added in no particular column order. As a result, it can be difficult to read through and understand the results of a query as the size of a table increases to thousands or even millions rows.</p>
+
+                    <p>To help with this, SQL provides a way to sort your results by a given column in ascending or descending order using the <code>ORDER BY</code> clause.</p>
+
                     <div class="syntax-box">SELECT column, another_column, ...
-FROM table_name
+FROM mytable
 WHERE condition(s)
 ORDER BY column ASC/DESC;</div>
 
-                    <h3>Limiting Results</h3>
-                    <p><code>LIMIT</code> reduces the number of rows returned. <code>OFFSET</code> specifies where to begin counting:</p>
+                    <p>When an <code>ORDER BY</code> clause is specified, each row is sorted alpha-numerically based on the specified column's value. In some databases, you can also specify a collation to better sort data containing international text.</p>
+
+                    <h3>Limiting results to a subset</h3>
+                    <p>Another clause which is commonly used with the <code>ORDER BY</code> clause are the <code>LIMIT</code> and <code>OFFSET</code> clauses, which are a useful optimization to indicate to the database the subset of the results you care about.</p>
+
+                    <p>The <code>LIMIT</code> will reduce the number of rows to return, and the optional <code>OFFSET</code> will specify where to begin counting the number rows from.</p>
+
                     <div class="syntax-box">SELECT column, another_column, ...
-FROM table_name
+FROM mytable
 WHERE condition(s)
 ORDER BY column ASC/DESC
 LIMIT num_limit OFFSET num_offset;</div>
 
-                    <p><code>LIMIT</code> and <code>OFFSET</code> are commonly used for pagination (like page 1, page 2, etc. of search results).</p>
+                    <p>If you think about websites like Reddit or Pinterest, the front page is a list of links sorted by popularity and time, and each subsequent page can be represented by sets of links at different offsets in the database. Using these clauses, the database can then execute queries faster and more efficiently by processing and returning only the requested content.</p>
+
+                    <div class="warning-box">
+                        <strong>Did you know?</strong> If you are curious about when the <code>LIMIT</code> and <code>OFFSET</code> are applied relative to the other parts of a query, they are generally done last after the other clauses have been applied.
+                    </div>
                 `,
                 exercises: [
                     "List all directors of Pixar movies (alphabetically), without duplicates",
@@ -615,29 +627,21 @@ LIMIT num_limit OFFSET num_offset;</div>
                 title: "SQL Review: Simple SELECT Queries",
                 db: "cities",
                 content: `
-                    <h3>Review Time!</h3>
-                    <p>You've learned the basics of SELECT queries. Let's practice with a different dataset - North American cities!</p>
+                    <p>You've done a good job getting to this point! Now that you've gotten a taste of how to write a basic query, you need to practice writing queries that solve actual problems.</p>
 
-                    <h3>Quick Reference</h3>
-                    <div class="syntax-box">SELECT DISTINCT column, AGG_FUNC(column_or_expression), ...
-FROM table_name
-WHERE constraint_expression
+                    <div class="syntax-box">SELECT column, another_column, ...
+FROM mytable
+WHERE condition(s)
 ORDER BY column ASC/DESC
-LIMIT count OFFSET offset;</div>
+LIMIT num_limit OFFSET num_offset;</div>
 
-                    <div class="data-preview">
-                        <h4>North American Cities Table</h4>
-                        <p>This table contains major cities with their country, population, and coordinates:</p>
-                        <ul>
-                            <li><strong>city</strong> - Name of the city</li>
-                            <li><strong>country</strong> - "USA", "Canada", or "Mexico"</li>
-                            <li><strong>population</strong> - City population</li>
-                            <li><strong>latitude</strong> - Geographic latitude (positive = north)</li>
-                            <li><strong>longitude</strong> - Geographic longitude (negative = west)</li>
-                        </ul>
+                    <p>In the exercise below, you will be working with a different table. This table instead contains information about a few of the most populous cities of North America including their population and geo-spatial location in the world.</p>
+
+                    <div class="warning-box">
+                        <strong>Did you know?</strong> Positive latitudes correspond to the northern hemisphere, and positive longitudes correspond to the eastern hemisphere. Since North America is north of the equator and west of the prime meridian, all of the cities in the list have positive latitudes and negative longitudes.
                     </div>
 
-                    <p><strong>Hint:</strong> Chicago's longitude is approximately -87.65</p>
+                    <p>Try and write some queries to find the information requested in the tasks below. You may need to use a different combination of clauses in your query for each task. Once you're done, continue onto the next lesson to learn about queries that span multiple tables.</p>
                 `,
                 exercises: [
                     "List all the Canadian cities and their populations",
@@ -648,30 +652,34 @@ LIMIT count OFFSET offset;</div>
                 ]
             },
             6: {
-                title: "SQL Lesson 6: Multi-table Queries with JOINs",
+                title: "SQL Lesson 6: Multi-table queries with JOINs",
                 db: "movies_boxoffice",
                 content: `
-                    <h3>Database Normalization</h3>
-                    <p>In real databases, data is often split across multiple tables to reduce redundancy. This is called <strong>normalization</strong>. Tables are linked by <strong>primary keys</strong> - unique identifiers for each row.</p>
+                    <p>Up to now, we've been working with a single table, but entity data in the real world is often broken down into pieces and stored across multiple orthogonal tables using a process known as <em>normalization</em>.</p>
 
-                    <h3>INNER JOIN</h3>
-                    <p>The <code>INNER JOIN</code> combines rows from two tables where the join condition is met:</p>
+                    <h3>Database normalization</h3>
+                    <p>Database normalization is useful because it minimizes duplicate data in any single table, and allows for data in the database to grow independently of each other (ie. Types of car engines can grow independent of each type of car). As a trade-off, queries get slightly more complex since they have to be able to find data from different parts of the database, and performance issues can arise when working with many large tables.</p>
 
+                    <p>In order to answer questions about an entity that has data spanning multiple tables in a normalized database, we need to learn how to write a query that can combine all that data and pull out exactly the information we need.</p>
+
+                    <h3>Multi-table queries with JOINs</h3>
+                    <p>Tables that share information about a single entity need to have a <em>primary key</em> that identifies that entity <em>uniquely</em> across the database. One common primary key type is an auto-incrementing integer (because they are space efficient), but it can also be a string, hashed value, so long as it is unique.</p>
+
+                    <p>Using the <code>JOIN</code> clause in a query, we can combine row data across two separate tables using this unique key. The first of the joins that we will introduce is the <code>INNER JOIN</code>.</p>
+
+                    <h3>Select query with INNER JOIN on multiple tables</h3>
                     <div class="syntax-box">SELECT column, another_table_column, ...
 FROM mytable
 INNER JOIN another_table
     ON mytable.id = another_table.id
 WHERE condition(s)
-ORDER BY column ASC/DESC
+ORDER BY column, ... ASC/DESC
 LIMIT num_limit OFFSET num_offset;</div>
 
-                    <p>The <code>INNER JOIN</code> matches rows from the first table with rows from the second table that have matching values (specified in <code>ON</code>). The result combines columns from both tables.</p>
+                    <p>The <code>INNER JOIN</code> is a process that matches rows from the first table and the second table which have the same key (as defined by the <code>ON</code> constraint) to create a result row with the combined columns from both tables. After the tables are joined, the other clauses we learned previously are then applied.</p>
 
-                    <div class="data-preview">
-                        <h4>Tables for this Lesson</h4>
-                        <p><strong>Movies:</strong> id, title, director, year, length_minutes</p>
-                        <p><strong>Boxoffice:</strong> movie_id, rating, domestic_sales, international_sales</p>
-                        <p>The <code>movie_id</code> in Boxoffice references the <code>id</code> in Movies.</p>
+                    <div class="warning-box">
+                        <strong>Did you know?</strong> You might see queries where the <code>INNER JOIN</code> is written simply as a <code>JOIN</code>. These two are equivalent, but we will continue to refer to these joins as inner-joins because they make the query easier to read once you start using other types of joins, which will be introduced in the following lesson.
                     </div>
                 `,
                 exercises: [
@@ -684,31 +692,27 @@ LIMIT num_limit OFFSET num_offset;</div>
                 title: "SQL Lesson 7: OUTER JOINs",
                 db: "employees",
                 content: `
-                    <h3>When INNER JOIN Isn't Enough</h3>
-                    <p>If two tables have asymmetric data (rows in one table don't all have matches in the other), <code>INNER JOIN</code> would exclude those unmatched rows.</p>
+                    <p>Depending on how you want to analyze the data, the <code>INNER JOIN</code> we used last lesson might not be sufficient because the resulting table only contains data that belongs in both of the tables.</p>
 
-                    <h3>LEFT, RIGHT, and FULL JOINs</h3>
-                    <table class="operator-table">
-                        <tr><th>Join Type</th><th>Description</th></tr>
-                        <tr><td><code>LEFT JOIN</code></td><td>Keeps ALL rows from the <strong>left</strong> table, with matching data from the right (NULL if no match)</td></tr>
-                        <tr><td><code>RIGHT JOIN</code></td><td>Keeps ALL rows from the <strong>right</strong> table, with matching data from the left</td></tr>
-                        <tr><td><code>FULL JOIN</code></td><td>Keeps ALL rows from <strong>both</strong> tables</td></tr>
-                    </table>
+                    <p>If the two tables have asymmetric data, which can easily happen when data is entered in different stages, then we would have to use a <code>LEFT JOIN</code>, <code>RIGHT JOIN</code> or <code>FULL JOIN</code> instead to ensure that the data you need is not left out of the results.</p>
 
+                    <h3>Select query with LEFT/RIGHT/FULL JOINs on multiple tables</h3>
                     <div class="syntax-box">SELECT column, another_column, ...
 FROM mytable
-LEFT/RIGHT/FULL JOIN another_table
+INNER/LEFT/RIGHT/FULL JOIN another_table
     ON mytable.id = another_table.matching_id
-WHERE condition(s);</div>
+WHERE condition(s)
+ORDER BY column, ... ASC/DESC
+LIMIT num_limit OFFSET num_offset;</div>
+
+                    <p>Like the <code>INNER JOIN</code> these three new joins have to specify which column to join the data on.</p>
+
+                    <p>When joining table A to table B, a <code>LEFT JOIN</code> simply includes rows from A regardless of whether a matching row is found in B. The <code>RIGHT JOIN</code> is the same, but reversed, keeping rows in B regardless of whether a match is found in A. Finally, a <code>FULL JOIN</code> simply means that rows from both tables are kept, regardless of whether a matching row exists in the other table.</p>
+
+                    <p>When using any of these new joins, you will likely have to write additional logic to deal with <code>NULL</code>s in the result and constraints (more on this in the next lesson).</p>
 
                     <div class="warning-box">
-                        <strong>Note:</strong> SQLite (used here) only supports LEFT JOIN. RIGHT and FULL JOINs can be simulated by swapping table order or using UNION.
-                    </div>
-
-                    <div class="data-preview">
-                        <h4>Tables for this Lesson</h4>
-                        <p><strong>Employees:</strong> id, name, role, building, years_employed</p>
-                        <p><strong>Buildings:</strong> building_name, capacity</p>
+                        <strong>Did you know?</strong> You might see queries written these joins written as <code>LEFT OUTER JOIN</code>, <code>RIGHT OUTER JOIN</code>, or <code>FULL OUTER JOIN</code>, but the <code>OUTER</code> keyword is really kept for SQL-92 compatibility and these queries are simply equivalent to <code>LEFT JOIN</code>, <code>RIGHT JOIN</code>, and <code>FULL JOIN</code> respectively.
                     </div>
                 `,
                 exercises: [
@@ -718,65 +722,57 @@ WHERE condition(s);</div>
                 ]
             },
             8: {
-                title: "SQL Lesson 8: A Short Note on NULLs",
+                title: "SQL Lesson 8: A short note on NULLs",
                 db: "employees",
                 content: `
-                    <h3>What is NULL?</h3>
-                    <p><code>NULL</code> represents missing or unknown data. It's different from zero or an empty string - it means "no value".</p>
+                    <p>As promised in the last lesson, we are going to quickly talk about <code>NULL</code> values in a SQL database. It's always good to reduce the possibility of <code>NULL</code> values in databases because they require special attention when constructing queries, constraints (certain functions behave differently with null values) and when processing the results.</p>
 
-                    <h3>Testing for NULL</h3>
-                    <p>You cannot use <code>=</code> or <code>!=</code> to test for NULL. Instead, use:</p>
+                    <p>An alternative to <code>NULL</code> values in your database is to have <em>data-type appropriate default values</em>, like 0 for numerical data, empty strings for text data, etc. But if your database needs to store incomplete data, then <code>NULL</code> values can be appropriate if the default values will skew later analysis (for example, when taking averages of numerical data).</p>
 
+                    <p>Sometimes, it's also not possible to avoid <code>NULL</code> values, as we saw in the last lesson when outer-joining two tables with asymmetric data. In these cases, you can test a column for <code>NULL</code> values in a <code>WHERE</code> clause by using either the <code>IS NULL</code> or <code>IS NOT NULL</code> constraint.</p>
+
+                    <h3>Select query with constraints on NULL values</h3>
                     <div class="syntax-box">SELECT column, another_column, ...
-FROM table_name
-WHERE column IS NULL;
-
--- Or to find non-null values:
-WHERE column IS NOT NULL;</div>
-
-                    <h3>When to Expect NULLs</h3>
-                    <ul>
-                        <li>Data that wasn't collected (e.g., optional fields)</li>
-                        <li>Results from OUTER JOINs where no match was found</li>
-                        <li>Placeholder for data to be added later</li>
-                    </ul>
+FROM mytable
+WHERE column IS/IS NOT NULL
+AND/OR another_condition
+AND/OR ...;</div>
 
                     <div class="warning-box">
-                        <strong>Tip:</strong> It's good practice to reduce NULLs where possible, as they require special handling and can lead to unexpected results in calculations.
+                        <strong>Did you know?</strong> This syntax is the result of the fact that <code>NULL</code> can never be compared directly with other values (including itself), so clauses like <code>col = NULL</code> or <code>col != NULL</code> will not work as you might expect.
                     </div>
                 `,
                 exercises: [
-                    "Find the name and role of all employees who have <strong>not</strong> been assigned to a building",
+                    "Find the name and role of all employees who have not been assigned to a building",
                     "Find the names of the buildings that hold no employees"
                 ]
             },
             9: {
-                title: "SQL Lesson 9: Queries with Expressions",
+                title: "SQL Lesson 9: Queries with expressions",
                 db: "movies_boxoffice",
                 content: `
-                    <h3>Using Expressions</h3>
-                    <p>SQL allows you to use expressions (mathematical operations, string functions, etc.) to transform data as you query it:</p>
+                    <p>In addition to querying and referencing raw column data with SQL, you can also use <em>expressions</em> to write more complex logic on column values in a query. These expressions can use mathematical and string functions along with basic arithmetic to transform values when the query is executed, as shown in this physics example.</p>
 
-                    <div class="syntax-box">SELECT col_expression AS alias, ...
-FROM table_name;</div>
+                    <h3>Example query with expressions</h3>
+                    <div class="syntax-box">SELECT particle_speed / 2.0 AS half_particle_speed
+FROM physics_data
+WHERE ABS(particle_position) * 10.0 > 500;</div>
 
-                    <h3>Examples of Expressions</h3>
-                    <div class="syntax-box">-- Math operations
-SELECT title, (domestic_sales + international_sales) / 1000000 AS millions
-FROM movies JOIN boxoffice ON id = movie_id;
+                    <p>Each database has its own supported set of mathematical, string, and date functions that can be used in a query, which you can find in their own respective docs.</p>
 
--- In WHERE clause
-SELECT * FROM movies WHERE year % 2 = 0;  -- Even years only</div>
+                    <p>The use of expressions can save time and extra post-processing of the result data, but can also make the query harder to read, so we recommend that when expressions are used in the <code>SELECT</code> part of the query, that they are also given a descriptive <em>alias</em> using the <code>AS</code> keyword.</p>
 
-                    <h3>Column Aliases with AS</h3>
-                    <p>Use <code>AS</code> to give columns readable names:</p>
-                    <div class="syntax-box">SELECT column AS better_name FROM table_name;</div>
+                    <h3>Select query with expression aliases</h3>
+                    <div class="syntax-box">SELECT col_expression AS expr_description, ...
+FROM mytable;</div>
 
-                    <h3>Table Aliases</h3>
-                    <p>You can also alias table names to make queries shorter:</p>
-                    <div class="syntax-box">SELECT m.title, b.rating
-FROM movies AS m
-JOIN boxoffice AS b ON m.id = b.movie_id;</div>
+                    <p>In addition to expressions, regular columns and even tables can also have aliases to make them easier to reference in the output and as a part of simplifying more complex queries.</p>
+
+                    <h3>Example query with both column and table name aliases</h3>
+                    <div class="syntax-box">SELECT column AS better_column_name, ...
+FROM a_long_widgets_table_name AS mywidgets
+INNER JOIN widget_sales
+    ON mywidgets.id = widget_sales.widget_id;</div>
                 `,
                 exercises: [
                     "List all movies and their combined sales in <strong>millions</strong> of dollars",
@@ -785,35 +781,40 @@ JOIN boxoffice AS b ON m.id = b.movie_id;</div>
                 ]
             },
             10: {
-                title: "SQL Lesson 10: Queries with Aggregates (Part 1)",
+                title: "SQL Lesson 10: Queries with aggregates (Pt. 1)",
                 db: "employees",
                 content: `
-                    <h3>Aggregate Functions</h3>
-                    <p>Aggregate functions let you summarize data across multiple rows:</p>
+                    <p>In addition to the simple expressions we introduced last lesson, SQL also supports the use of <em>aggregate expressions</em> (or functions) that allow you to summarize information about a group of rows of data. With the Pixar database that you've been using, aggregate functions can be used to answer questions like, "How many movies has Pixar produced?", or "What is the highest grossing Pixar film each year?".</p>
 
+                    <h3>Select query with aggregate functions over all rows</h3>
+                    <div class="syntax-box">SELECT AGG_FUNC(column_or_expression) AS aggregate_description, ...
+FROM mytable
+WHERE constraint_expression;</div>
+
+                    <p>Without a specified grouping, each aggregate function is going to run on the whole set of result rows and return a single value. And like normal expressions, giving your aggregate functions an alias ensures that the results will be easier to read and process.</p>
+
+                    <h3>Common aggregate functions</h3>
                     <table class="operator-table">
                         <tr><th>Function</th><th>Description</th></tr>
-                        <tr><td><code>COUNT(*)</code></td><td>Count all rows</td></tr>
-                        <tr><td><code>COUNT(column)</code></td><td>Count non-NULL values in column</td></tr>
-                        <tr><td><code>MIN(column)</code></td><td>Find the smallest value</td></tr>
-                        <tr><td><code>MAX(column)</code></td><td>Find the largest value</td></tr>
-                        <tr><td><code>AVG(column)</code></td><td>Calculate the average</td></tr>
-                        <tr><td><code>SUM(column)</code></td><td>Calculate the total</td></tr>
+                        <tr><td><code>COUNT(*)</code>, <code>COUNT(column)</code></td><td>A common function used to counts the number of rows in the group if no column name is specified. Otherwise, count the number of rows in the group with non-NULL values in the specified column.</td></tr>
+                        <tr><td><code>MIN(column)</code></td><td>Finds the smallest numerical value in the specified column for all rows in the group.</td></tr>
+                        <tr><td><code>MAX(column)</code></td><td>Finds the largest numerical value in the specified column for all rows in the group.</td></tr>
+                        <tr><td><code>AVG(column)</code></td><td>Finds the average numerical value in the specified column for all rows in the group.</td></tr>
+                        <tr><td><code>SUM(column)</code></td><td>Finds the sum of all numerical values in the specified column for the rows in the group.</td></tr>
                     </table>
 
-                    <h3>Basic Usage</h3>
-                    <div class="syntax-box">SELECT AGG_FUNC(column) AS description
-FROM table_name
-WHERE condition;</div>
+                    <h3>Grouped aggregate functions</h3>
+                    <p>In addition to aggregating across all the rows, you can instead apply the aggregate functions to individual groups of data within that group (ie. box office sales for Comedies vs Action movies).</p>
 
-                    <h3>Grouping with GROUP BY</h3>
-                    <p>To apply aggregates to groups of rows:</p>
-                    <div class="syntax-box">SELECT column, AGG_FUNC(column) AS description
-FROM table_name
-WHERE condition
+                    <p>This would then create as many results as there are unique groups defined as by the <code>GROUP BY</code> clause.</p>
+
+                    <h3>Select query with aggregate functions over groups</h3>
+                    <div class="syntax-box">SELECT AGG_FUNC(column_or_expression) AS aggregate_description, ...
+FROM mytable
+WHERE constraint_expression
 GROUP BY column;</div>
 
-                    <p>This groups rows with the same value in the specified column, then applies the aggregate to each group.</p>
+                    <p>The <code>GROUP BY</code> clause works by grouping rows that have the same value in the column specified.</p>
                 `,
                 exercises: [
                     "Find the longest time that an employee has been at the studio",
@@ -822,28 +823,24 @@ GROUP BY column;</div>
                 ]
             },
             11: {
-                title: "SQL Lesson 11: Queries with Aggregates (Part 2)",
+                title: "SQL Lesson 11: Queries with aggregates (Pt. 2)",
                 db: "employees",
                 content: `
-                    <h3>Filtering Groups with HAVING</h3>
-                    <p>The <code>HAVING</code> clause filters groups <strong>after</strong> the <code>GROUP BY</code> aggregation. This is different from <code>WHERE</code>, which filters rows <strong>before</strong> grouping.</p>
+                    <p>Our queries are getting fairly complex, but we have nearly introduced all the important parts of a <code>SELECT</code> query. One thing that you might have noticed is that if the <code>GROUP BY</code> clause is executed after the <code>WHERE</code> clause (which filters the rows which are to be grouped), then how exactly do we filter the grouped rows?</p>
 
-                    <div class="syntax-box">SELECT column, AGG_FUNC(column) AS alias
-FROM table_name
-WHERE condition          -- Filters rows BEFORE grouping
+                    <p>Luckily, SQL allows us to do this by adding an additional <code>HAVING</code> clause which is used specifically with the <code>GROUP BY</code> clause to allow us to filter grouped rows from the result set.</p>
+
+                    <h3>Select query with HAVING constraint</h3>
+                    <div class="syntax-box">SELECT group_by_column, AGG_FUNC(column_expression) AS aggregate_result_alias, ...
+FROM mytable
+WHERE condition
 GROUP BY column
-HAVING group_condition;  -- Filters groups AFTER aggregation</div>
+HAVING group_condition;</div>
 
-                    <h3>Example: WHERE vs HAVING</h3>
-                    <div class="syntax-box">-- Count employees per role, but only roles with more than 3 employees
-SELECT role, COUNT(*) AS num_employees
-FROM employees
-WHERE years_employed > 1        -- First: only employees with >1 year
-GROUP BY role
-HAVING COUNT(*) > 3;            -- Then: only roles with >3 people</div>
+                    <p>The <code>HAVING</code> clause constraints are written the same way as the <code>WHERE</code> clause constraints, and are applied to the grouped rows. With our examples, this might not seem like a particularly useful construct, but if you imagine data with millions of rows with different properties, being able to apply additional constraints is often necessary to quickly make sense of the data.</p>
 
                     <div class="warning-box">
-                        <strong>Remember:</strong> If you're not using GROUP BY, use WHERE instead of HAVING!
+                        <strong>Did you know?</strong> If you aren't using the <code>GROUP BY</code> clause, a simple <code>WHERE</code> clause will suffice.
                     </div>
                 `,
                 exercises: [
@@ -853,37 +850,52 @@ HAVING COUNT(*) > 3;            -- Then: only roles with >3 people</div>
                 ]
             },
             12: {
-                title: "SQL Lesson 12: Order of Query Execution",
+                title: "SQL Lesson 12: Order of execution of a Query",
                 db: "movies_boxoffice",
                 content: `
-                    <h3>Query Execution Order</h3>
-                    <p>SQL doesn't execute queries in the order you write them. Understanding execution order helps you write correct queries:</p>
+                    <p>Now that we have an idea of all the parts of a query, we can now talk about how they all fit together in the context of a complete query.</p>
 
-                    <div class="syntax-box">1. FROM and JOINs    -- Tables are joined first
-2. WHERE             -- Rows are filtered
-3. GROUP BY          -- Rows are grouped
-4. HAVING            -- Groups are filtered
-5. SELECT            -- Columns are selected/computed
-6. DISTINCT          -- Duplicates are removed
-7. ORDER BY          -- Results are sorted
-8. LIMIT / OFFSET    -- Results are limited</div>
+                    <h3>Complete SELECT query</h3>
+                    <div class="syntax-box">SELECT DISTINCT column, AGG_FUNC(column_or_expression), ...
+FROM mytable
+    JOIN another_table
+        ON mytable.column = another_table.column
+    WHERE constraint_expression
+    GROUP BY column
+    HAVING constraint_expression
+    ORDER BY column ASC/DESC
+    LIMIT count OFFSET COUNT;</div>
 
-                    <h3>Why This Matters</h3>
-                    <ul>
-                        <li>You can't use column aliases in WHERE (SELECT happens later)</li>
-                        <li>HAVING can use aggregates because GROUP BY happens first</li>
-                        <li>ORDER BY can use aliases because it runs after SELECT</li>
-                    </ul>
+                    <p>Each query begins with finding the data that we need in a database, and then filtering that data down into something that can be processed and understood as quickly as possible. Because each part of the query is executed sequentially, it's important to understand the order of execution so that you know what results are accessible where.</p>
 
-                    <h3>Complete Query Template</h3>
-                    <div class="syntax-box">SELECT DISTINCT column, AGG_FUNC(column) AS alias, ...
-FROM table_name
-    JOIN another_table ON table_name.col = another_table.col
-WHERE constraint
-GROUP BY column
-HAVING constraint
-ORDER BY column ASC/DESC
-LIMIT count OFFSET offset;</div>
+                    <h3>Query order of execution</h3>
+
+                    <p><strong>1. FROM and JOINs</strong><br>
+                    The <code>FROM</code> clause, and subsequent <code>JOIN</code>s are first executed to determine the total working set of data that is being queried. This includes subqueries in this clause, and can cause temporary tables to be created under the hood containing all the columns and rows of the tables being joined.</p>
+
+                    <p><strong>2. WHERE</strong><br>
+                    Once we have the total working set of data, the first-pass <code>WHERE</code> constraints are applied to the individual rows, and rows that do not satisfy the constraint are discarded. Each of the constraints can only access columns directly from the tables requested in the <code>FROM</code> clause. Aliases in the <code>SELECT</code> part of the query are not accessible in most databases since they may include expressions dependent on parts of the query that have not yet executed.</p>
+
+                    <p><strong>3. GROUP BY</strong><br>
+                    The remaining rows after the <code>WHERE</code> constraints are applied are then grouped based on common values in the column specified in the <code>GROUP BY</code> clause. As a result of the grouping, there will only be as many rows as there are unique values in that column. Implicitly, this means that you should only need to use this when you have aggregate functions in your query.</p>
+
+                    <p><strong>4. HAVING</strong><br>
+                    If the query has a <code>GROUP BY</code> clause, then the constraints in the <code>HAVING</code> clause are then applied to the grouped rows, discard the grouped rows that don't satisfy the constraint. Like the <code>WHERE</code> clause, aliases are also not accessible from this step in most databases.</p>
+
+                    <p><strong>5. SELECT</strong><br>
+                    Any expressions in the <code>SELECT</code> part of the query are finally computed.</p>
+
+                    <p><strong>6. DISTINCT</strong><br>
+                    Of the remaining rows, rows with duplicate values in the column marked as <code>DISTINCT</code> will be discarded.</p>
+
+                    <p><strong>7. ORDER BY</strong><br>
+                    If an order is specified by the <code>ORDER BY</code> clause, the rows are then sorted by the specified data in either ascending or descending order. Since all the expressions in the <code>SELECT</code> part of the query have been computed, you can reference aliases in this clause.</p>
+
+                    <p><strong>8. LIMIT / OFFSET</strong><br>
+                    Finally, the rows that fall outside the range specified by the <code>LIMIT</code> and <code>OFFSET</code> are discarded, leaving the final set of rows to be returned from the query.</p>
+
+                    <h3>Conclusion</h3>
+                    <p>Not every query needs to have all the parts we listed above, but a part of why SQL is so flexible is that it allows developers and data analysts to quickly manipulate data without having to write additional code, all just by using the above clauses.</p>
                 `,
                 exercises: [
                     "Find the number of movies each director has directed",
@@ -891,256 +903,200 @@ LIMIT count OFFSET offset;</div>
                 ]
             },
             13: {
-                title: "SQL Lesson 13: Inserting Rows",
+                title: "SQL Lesson 13: Inserting rows",
                 db: "movies_boxoffice",
                 content: `
-                    <h3>Database Schema</h3>
-                    <p>A database <strong>schema</strong> defines the structure of each table - what columns exist and what types of data they can hold. INSERT statements must match this schema.</p>
+                    <p>We've spent quite a few lessons on how to query for data in a database, so it's time to start learning a bit about SQL schemas and how to add new data.</p>
 
-                    <h3>INSERT Syntax</h3>
-                    <p><strong>Insert with all columns (in order):</strong></p>
-                    <div class="syntax-box">INSERT INTO table_name
-VALUES (value1, value2, ...);</div>
+                    <h3>What is a Schema?</h3>
+                    <p>We previously described a table in a database as a two-dimensional set of rows and columns, with the columns being the properties and the rows being instances of the entity in the table. In SQL, the <em>database schema</em> is what describes the structure of each table, and the datatypes that each column of the table can contain.</p>
 
-                    <p><strong>Insert with specific columns:</strong></p>
-                    <div class="syntax-box">INSERT INTO table_name
-(column1, column2, ...)
-VALUES (value1, value2, ...);</div>
+                    <p>This fixed structure is what allows a database to be efficient, and consistent despite storing millions or even billions of rows.</p>
 
-                    <h3>Multiple Rows</h3>
-                    <div class="syntax-box">INSERT INTO table_name
-VALUES
-    (val1, val2, ...),
-    (val1, val2, ...),
-    (val1, val2, ...);</div>
+                    <h3>Inserting new data</h3>
+                    <p>When inserting data into a database, we need to use an <code>INSERT</code> statement, which declares which table to write into, the columns of data that we are filling, and one or more rows of data to insert. In general, each row of data you insert should contain values for every corresponding column in the table. You can insert multiple rows at a time by just listing them sequentially.</p>
 
-                    <h3>Expressions in INSERT</h3>
-                    <p>You can use expressions to compute values:</p>
-                    <div class="syntax-box">INSERT INTO boxoffice (movie_id, rating, sales)
+                    <h3>Insert statement with values for all columns</h3>
+                    <div class="syntax-box">INSERT INTO mytable
+VALUES (value_or_expr, another_value_or_expr, ...),
+       (value_or_expr_2, another_value_or_expr_2, ...),
+       ...;</div>
+
+                    <p>In some cases, if you have incomplete data and the table contains columns that support default values, you can insert rows with only the columns of data you have by specifying them explicitly.</p>
+
+                    <h3>Insert statement with specific columns</h3>
+                    <div class="syntax-box">INSERT INTO mytable
+(column, another_column, ...)
+VALUES (value_or_expr, another_value_or_expr, ...),
+       (value_or_expr_2, another_value_or_expr_2, ...),
+       ...;</div>
+
+                    <p>In these cases, the number of values need to match the number of columns specified. Despite this being a more verbose statement to write, inserting values this way has the benefit of being forward compatible. For example, if you add a new column to the table with a default value, no hardcoded <code>INSERT</code> statements will have to change as a result to accommodate that change.</p>
+
+                    <p>In addition, you can use mathematical and string expressions with the values that you are inserting.</p>
+
+                    <h3>Example Insert statement with expressions</h3>
+                    <div class="syntax-box">INSERT INTO boxoffice
+(movie_id, rating, sales_in_millions)
 VALUES (1, 9.9, 283742034 / 1000000);</div>
-
-                    <div class="data-preview">
-                        <h4>Movies Schema</h4>
-                        <p><code>id (INT), title (TEXT), director (TEXT), year (INT), length_minutes (INT)</code></p>
-                        <h4>Boxoffice Schema</h4>
-                        <p><code>movie_id (INT), rating (REAL), domestic_sales (INT), international_sales (INT)</code></p>
-                    </div>
                 `,
                 exercises: [
                     "Add the studio's new production, <strong>Toy Story 4</strong> to the list of movies (you can use any director)",
-                    "Toy Story 4 has been released! Add the record with rating=<strong>8.7</strong>, domestic_sales=<strong>340000000</strong>, international_sales=<strong>270000000</strong>"
+                    "Toy Story 4 has been released to critical acclaim! It had a rating of <strong>8.7</strong>, and made <strong>340 million domestically</strong> and <strong>270 million internationally</strong>. Add the record to the BoxOffice table."
                 ]
             },
             14: {
-                title: "SQL Lesson 14: Updating Rows",
+                title: "SQL Lesson 14: Updating rows",
                 db: "movies",
                 content: `
-                    <h3>UPDATE Statement</h3>
-                    <p>The <code>UPDATE</code> statement modifies existing data in a table:</p>
+                    <p>In addition to adding new data, a common task is to update existing data, which can be done using an <code>UPDATE</code> statement. Similar to the <code>INSERT</code> statement, you have to specify exactly which table, columns, and rows to update. In addition, the data you are updating has to match the data type of the columns in the table schema.</p>
 
-                    <div class="syntax-box">UPDATE table_name
+                    <h3>Update statement with values</h3>
+                    <div class="syntax-box">UPDATE mytable
 SET column = value_or_expr,
     other_column = another_value_or_expr,
     ...
 WHERE condition;</div>
 
-                    <div class="warning-box">
-                        <strong>DANGER!</strong> If you forget the WHERE clause, the UPDATE will apply to <strong>ALL rows</strong> in the table!
-                    </div>
+                    <p>The statement works by taking multiple column/value pairs, and applying those changes to each and every row that satisfies the constraint in the <code>WHERE</code> clause.</p>
 
-                    <h3>Best Practice</h3>
-                    <p>Before running UPDATE, test your WHERE clause with SELECT:</p>
-                    <div class="syntax-box">-- First, verify you're targeting the right rows:
-SELECT * FROM movies WHERE id = 2;
+                    <h3>Taking care</h3>
+                    <p>Most people working with SQL will make mistakes updating data at one point or another. Whether it's updating the wrong set of rows in a production database, or accidentally leaving out the <code>WHERE</code> clause (which causes the update to apply to <em>all</em> rows), you need to be extra careful when constructing <code>UPDATE</code> statements.</p>
 
--- Then update:
-UPDATE movies SET director = "John Lasseter" WHERE id = 2;</div>
-
-                    <h3>Updating Multiple Columns</h3>
-                    <div class="syntax-box">UPDATE movies
-SET title = "Toy Story 3",
-    director = "Lee Unkrich"
-WHERE id = 11;</div>
+                    <p>One helpful tip is to always write the constraint first and test it in a <code>SELECT</code> query to make sure you are updating the right rows, and only then writing the column/value pairs to update.</p>
                 `,
                 exercises: [
                     "The director for A Bug's Life is incorrect, it was actually directed by <strong>John Lasseter</strong>",
                     "The year that Toy Story 2 was released is incorrect, it was actually released in <strong>1999</strong>",
-                    "Both the title and director for Toy Story 8 are incorrect! The title should be \"<strong>Toy Story 3</strong>\" and it was directed by <strong>Lee Unkrich</strong>"
+                    "Both the title and director for Toy Story 8 is incorrect! The title should be \"<strong>Toy Story 3</strong>\" and it was directed by <strong>Lee Unkrich</strong>"
                 ]
             },
             15: {
-                title: "SQL Lesson 15: Deleting Rows",
+                title: "SQL Lesson 15: Deleting rows",
                 db: "movies",
                 content: `
-                    <h3>DELETE Statement</h3>
-                    <p>The <code>DELETE</code> statement removes rows from a table:</p>
+                    <p>When you need to delete data from a table in the database, you can use a <code>DELETE</code> statement, which describes the table to act on, and the rows of the table to delete through the <code>WHERE</code> clause.</p>
 
-                    <div class="syntax-box">DELETE FROM table_name
+                    <h3>Delete statement with condition</h3>
+                    <div class="syntax-box">DELETE FROM mytable
 WHERE condition;</div>
 
-                    <div class="warning-box">
-                        <strong>EXTREME DANGER!</strong> If you omit the WHERE clause, DELETE will remove <strong>ALL rows</strong> from the table! This is irreversible.
-                    </div>
+                    <p>If you decide to leave out the <code>WHERE</code> constraint, then <em>all</em> rows are removed, which is a quick and easy way to clear out a table completely (if intentional).</p>
 
-                    <h3>Best Practice</h3>
-                    <p>Always test your WHERE clause with SELECT first:</p>
-                    <div class="syntax-box">-- Verify what will be deleted:
-SELECT * FROM movies WHERE year < 2005;
-
--- If that looks right, delete:
-DELETE FROM movies WHERE year < 2005;</div>
-
-                    <h3>Common Patterns</h3>
-                    <div class="syntax-box">-- Delete specific row by ID
-DELETE FROM movies WHERE id = 5;
-
--- Delete multiple matching rows
-DELETE FROM employees WHERE years_employed < 1;
-
--- Delete all (DANGEROUS!)
-DELETE FROM table_name;</div>
-
-                    <p><strong>Tip:</strong> "Read your DELETE statement twice, execute once!"</p>
+                    <h3>Taking extra care</h3>
+                    <p>Like the <code>UPDATE</code> statement from last lesson, it's recommended that you run the constraint in a <code>SELECT</code> query first to ensure that you are removing the right rows. Without a proper backup or test database, it is downright easy to irrevocably remove data, so always read your <code>DELETE</code> statements twice and execute once.</p>
                 `,
                 exercises: [
-                    "This database is getting too big, let's remove all movies that were released <strong>before</strong> 2005",
-                    "Andrew Stanton has also left the studio, so please remove all movies directed by him"
+                    "This database is getting too big, let's remove all movies that were released <strong>before</strong> 2005.",
+                    "Andrew Stanton has also left the studio, so please remove all movies directed by him."
                 ]
             },
             16: {
-                title: "SQL Lesson 16: Creating Tables",
+                title: "SQL Lesson 16: Creating tables",
                 db: "empty",
                 content: `
-                    <h3>CREATE TABLE Statement</h3>
-                    <p>Create a new table with specified columns and data types:</p>
+                    <p>When you have new entities and relationships to store in your database, you can create a new database table using the <code>CREATE TABLE</code> statement.</p>
 
-                    <div class="syntax-box">CREATE TABLE IF NOT EXISTS table_name (
-    column1 DataType Constraints,
-    column2 DataType Constraints,
+                    <h3>Create table statement w/ optional table constraint and default value</h3>
+                    <div class="syntax-box">CREATE TABLE IF NOT EXISTS mytable (
+    column DataType TableConstraint DEFAULT default_value,
+    another_column DataType TableConstraint DEFAULT default_value,
     ...
 );</div>
 
-                    <p><code>IF NOT EXISTS</code> prevents errors if the table already exists.</p>
+                    <p>The structure of the new table is defined by its <em>table schema</em>, which defines a series of columns. Each column has a name, the type of data allowed in that column, an <em>optional</em> table constraint on values being inserted, and an optional default value.</p>
 
-                    <h3>Common Data Types</h3>
+                    <p>If there already exists a table with the same name, the SQL implementation will usually throw an error, so to suppress the error and skip creating a table if one exists, you can use the <code>IF NOT EXISTS</code> clause.</p>
+
+                    <h3>Table data types</h3>
+                    <p>Different databases support different data types, but the common types support numeric, string, and other miscellaneous things like dates, booleans, or even binary data. Here are some examples that you might use in real code.</p>
+
                     <table class="operator-table">
-                        <tr><th>Type</th><th>Description</th></tr>
-                        <tr><td><code>INTEGER, INT</code></td><td>Whole numbers</td></tr>
-                        <tr><td><code>REAL, FLOAT, DOUBLE</code></td><td>Decimal numbers</td></tr>
-                        <tr><td><code>TEXT, VARCHAR(n)</code></td><td>Text strings</td></tr>
-                        <tr><td><code>BOOLEAN</code></td><td>True/False (0/1)</td></tr>
-                        <tr><td><code>DATE, DATETIME</code></td><td>Date/time values</td></tr>
-                        <tr><td><code>BLOB</code></td><td>Binary data</td></tr>
+                        <tr><th>Data type</th><th>Description</th></tr>
+                        <tr><td><code>INTEGER</code>, <code>BOOLEAN</code></td><td>The integer datatypes can store whole integer values like the count of a number or an age. In some implementations, the boolean value is just represented as an integer value of just 0 or 1.</td></tr>
+                        <tr><td><code>FLOAT</code>, <code>DOUBLE</code>, <code>REAL</code></td><td>The floating point datatypes can store more precise numerical data like measurements or fractional values. Different types can be used depending on the floating point precision required for that value.</td></tr>
+                        <tr><td><code>CHARACTER(num_chars)</code>, <code>VARCHAR(num_chars)</code>, <code>TEXT</code></td><td>The text based datatypes can store strings and text in all sorts of locales. The distinction between the various types generally amount to underlaying efficiency of the database when working with these columns. Both the CHARACTER and VARCHAR (variable character) types are specified with the max number of characters that they can store (longer values may be truncated), so can be more efficient to store and query with big tables.</td></tr>
+                        <tr><td><code>DATE</code>, <code>DATETIME</code></td><td>SQL can also store date and time stamps to keep track of time series and event data. They can be tricky to work with especially when manipulating data across timezones.</td></tr>
+                        <tr><td><code>BLOB</code></td><td>Finally, SQL can store binary data in blobs right in the database. These values are often opaque to the database, so you usually have to store them with the right metadata to requery them.</td></tr>
                     </table>
 
-                    <h3>Common Constraints</h3>
+                    <h3>Table constraints</h3>
+                    <p>We aren't going to dive too deep into table constraints in this lesson, but each column can have additional table constraints on it which limit what values can be inserted into that column. This is not a comprehensive list, but will show a few common constraints that you might find useful.</p>
+
                     <table class="operator-table">
                         <tr><th>Constraint</th><th>Description</th></tr>
-                        <tr><td><code>PRIMARY KEY</code></td><td>Unique identifier for each row</td></tr>
-                        <tr><td><code>AUTOINCREMENT</code></td><td>Auto-fills with incrementing integers</td></tr>
-                        <tr><td><code>UNIQUE</code></td><td>No duplicate values allowed</td></tr>
-                        <tr><td><code>NOT NULL</code></td><td>Must have a value</td></tr>
-                        <tr><td><code>DEFAULT value</code></td><td>Default value if none provided</td></tr>
-                        <tr><td><code>CHECK (expr)</code></td><td>Custom validation</td></tr>
-                        <tr><td><code>FOREIGN KEY</code></td><td>References another table</td></tr>
+                        <tr><td><code>PRIMARY KEY</code></td><td>This means that the values in this column are unique, and each value can be used to identify a single row in this table.</td></tr>
+                        <tr><td><code>AUTOINCREMENT</code></td><td>For integer values, this means that the value is automatically filled in and incremented with each row insertion. Not supported in all databases.</td></tr>
+                        <tr><td><code>UNIQUE</code></td><td>This means that the values in this column have to be unique, so you can't insert another row with the same value in this column as another row in the table. Differs from the 'PRIMARY KEY' in that it doesn't have to be a key for a row in the table.</td></tr>
+                        <tr><td><code>NOT NULL</code></td><td>This means that the inserted value can not be 'NULL'.</td></tr>
+                        <tr><td><code>CHECK (expression)</code></td><td>This allows you to run a more complex expression to test whether the values inserted are valid. For example, you can check that values are positive, or greater than a specific size, or start with a certain prefix, etc.</td></tr>
+                        <tr><td><code>FOREIGN KEY</code></td><td>This is a consistency check which ensures that each value in this column corresponds to another value in a column in another table. For example, if there are two tables, one listing all Employees by ID, and another listing their payroll information, the 'FOREIGN KEY' can ensure that every row in the payroll table corresponds to a valid employee in the master Employee list.</td></tr>
                     </table>
 
-                    <h3>Example</h3>
+                    <h3>An example</h3>
+                    <p>Here's an example schema for the Movies table that we've been using in the lessons up to now.</p>
+
                     <div class="syntax-box">CREATE TABLE movies (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    title TEXT NOT NULL,
+    id INTEGER PRIMARY KEY,
+    title TEXT,
     director TEXT,
     year INTEGER,
-    length_minutes INTEGER DEFAULT 90
+    length_minutes INTEGER
 );</div>
                 `,
                 exercises: [
-                    "Create a new table named <strong>Database</strong> with columns: <code>Name</code> (TEXT), <code>Version</code> (REAL), <code>Download_count</code> (INTEGER)"
+                    "Create a new table named <strong>Database</strong> with the following columns:<br>- <code>Name</code> A string (text) describing the name of the database<br>- <code>Version</code> A number (floating point) of the latest version of this database<br>- <code>Download_count</code> An integer count of the number of times this database was downloaded<br><br>This table has no constraints."
                 ]
             },
             17: {
-                title: "SQL Lesson 17: Altering Tables",
+                title: "SQL Lesson 17: Altering tables",
                 db: "movies",
                 content: `
-                    <h3>ALTER TABLE Statement</h3>
-                    <p>Modify an existing table's structure:</p>
+                    <p>As your data changes over time, SQL provides a way for you to update your corresponding tables and database schemas by using the <code>ALTER TABLE</code> statement to add, remove, or modify columns and table constraints.</p>
 
-                    <h3>Add a Column</h3>
-                    <div class="syntax-box">ALTER TABLE table_name
-ADD column DataType OptionalConstraints;</div>
+                    <h3>Adding columns</h3>
+                    <p>The syntax for adding a new column is similar to the syntax when creating new rows in the <code>CREATE TABLE</code> statement. You need to specify the data type of the column along with any potential table constraints and default values to be applied to both existing <em>and</em> new rows.</p>
 
-                    <h3>Remove a Column</h3>
-                    <div class="syntax-box">ALTER TABLE table_name
-DROP column;</div>
+                    <div class="syntax-box">ALTER TABLE mytable
+ADD column DataType OptionalTableConstraint
+    DEFAULT default_value;</div>
 
-                    <h3>Rename a Table</h3>
-                    <div class="syntax-box">ALTER TABLE table_name
+                    <h3>Removing columns</h3>
+                    <p>Dropping columns is as easy as specifying the column to drop, however, some databases (including SQLite) don't support this feature. Instead you may have to create a new table and migrate the data over.</p>
+
+                    <div class="syntax-box">ALTER TABLE mytable
+DROP column_to_be_deleted;</div>
+
+                    <h3>Renaming the table</h3>
+                    <p>If you need to rename the table itself, you can also do that using the <code>RENAME TO</code> clause of the statement.</p>
+
+                    <div class="syntax-box">ALTER TABLE mytable
 RENAME TO new_table_name;</div>
 
-                    <h3>Examples</h3>
-                    <div class="syntax-box">-- Add an 'aspect_ratio' column
-ALTER TABLE movies ADD aspect_ratio REAL;
-
--- Add a 'language' column with default
-ALTER TABLE movies ADD language TEXT DEFAULT 'English';
-
--- Rename the table
-ALTER TABLE movies RENAME TO films;</div>
-
-                    <div class="warning-box">
-                        <strong>Note:</strong> SQLite has limited ALTER TABLE support. You can ADD columns and RENAME tables, but DROP column may not work in older versions.
-                    </div>
+                    <h3>Other changes</h3>
+                    <p>Each database implementation supports different methods of altering their tables, so it's always best to consult your database docs before proceeding: <a href="https://dev.mysql.com/doc/refman/8.0/en/alter-table.html">MySQL</a>, <a href="https://www.postgresql.org/docs/current/sql-altertable.html">Postgres</a>, <a href="https://www.sqlite.org/lang_altertable.html">SQLite</a>, <a href="https://docs.microsoft.com/en-us/sql/t-sql/statements/alter-table-transact-sql">Microsoft SQL Server</a>.</p>
                 `,
                 exercises: [
-                    "Add a new column named <strong>Aspect_ratio</strong> with a <code>REAL</code> data type to store the aspect-ratio each movie was released in",
-                    "Add another column named <strong>Language</strong> with a <code>TEXT</code> data type to store the language the movie was released in. Default to <strong>English</strong>."
+                    "Add a column named <strong>Aspect_ratio</strong> with a <code>FLOAT</code> data type to store the aspect-ratio each movie was released in.",
+                    "Add another column named <strong>Language</strong> with a <code>TEXT</code> data type to store the language that the movie was released in. Ensure that the default for this language is <strong>English</strong>."
                 ]
             },
             18: {
-                title: "SQL Lesson 18: Dropping Tables",
-                db: "movies",
+                title: "SQL Lesson 18: Dropping tables",
+                db: "movies_boxoffice",
                 content: `
-                    <h3>DROP TABLE Statement</h3>
-                    <p>Remove an entire table from the database:</p>
+                    <p>In some rare cases, you may want to remove an entire table including all of its data and metadata, and to do so, you can use the <code>DROP TABLE</code> statement, which differs from the <code>DELETE</code> statement in that it also removes the table schema from the database entirely.</p>
 
-                    <div class="syntax-box">DROP TABLE IF EXISTS table_name;</div>
+                    <h3>Drop table statement</h3>
+                    <div class="syntax-box">DROP TABLE IF EXISTS mytable;</div>
 
-                    <p><code>IF EXISTS</code> prevents errors if the table doesn't exist.</p>
+                    <p>Like the <code>CREATE TABLE</code> statement, the database may throw an error if the specified table does not exist, and to suppress that error, you can use the <code>IF EXISTS</code> clause.</p>
 
-                    <div class="warning-box">
-                        <strong>IRREVERSIBLE!</strong> Dropping a table deletes all its data and structure permanently. Unlike DELETE (which removes rows), DROP removes the table itself.
-                    </div>
-
-                    <h3>When to Use DROP TABLE</h3>
-                    <ul>
-                        <li>Removing temporary tables</li>
-                        <li>Cleaning up during development</li>
-                        <li>Restructuring the database</li>
-                    </ul>
-
-                    <h3>Related Commands</h3>
-                    <div class="syntax-box">-- Delete all rows but keep table structure
-DELETE FROM table_name;
-
--- Or (faster for large tables):
-TRUNCATE TABLE table_name;  -- Not supported in SQLite
-
--- Remove table entirely
-DROP TABLE table_name;</div>
-
-                    <h3>Congratulations!</h3>
-                    <p>You've completed all the SQL lessons! You now know how to:</p>
-                    <ul>
-                        <li>Query data with SELECT, WHERE, ORDER BY, LIMIT</li>
-                        <li>Join multiple tables</li>
-                        <li>Use aggregate functions</li>
-                        <li>Insert, update, and delete data</li>
-                        <li>Create, modify, and drop tables</li>
-                    </ul>
+                    <p>In addition, if you have another table that is dependent on columns in table you are removing (for example, with a <code>FOREIGN KEY</code> dependency) then you will have to either update all dependent tables first to remove the dependent rows or to remove those tables entirely.</p>
                 `,
                 exercises: [
-                    "We've finished with this database, so drop the <strong>Movies</strong> table",
-                    "Also drop the <strong>Boxoffice</strong> table as well"
+                    "We've sadly reached the end of our lessons, lets clean up by removing the <strong>Movies</strong> table",
+                    "And drop the <strong>BoxOffice</strong> table as well"
                 ]
             }
         };
