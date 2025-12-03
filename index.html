@@ -422,6 +422,15 @@
                 <a class="lesson-link" data-lesson="17">Lesson 17: ALTER TABLE</a>
                 <a class="lesson-link" data-lesson="18">Lesson 18: DROP TABLE</a>
             </div>
+
+            <div class="lesson-group">
+                <div class="lesson-group-title">Sandbox Practice</div>
+                <a class="lesson-link" data-lesson="19">Practice 1: Movie Analysis</a>
+                <a class="lesson-link" data-lesson="20">Practice 2: Employee Reports</a>
+                <a class="lesson-link" data-lesson="21">Practice 3: Data Manipulation</a>
+                <a class="lesson-link" data-lesson="22">Practice 4: Complex Queries</a>
+                <a class="lesson-link" data-lesson="23">Practice 5: Final Challenge</a>
+            </div>
         </nav>
 
         <main class="main">
@@ -1098,6 +1107,145 @@ RENAME TO new_table_name;</div>
                     "We've sadly reached the end of our lessons, lets clean up by removing the <strong>Movies</strong> table",
                     "And drop the <strong>BoxOffice</strong> table as well"
                 ]
+            },
+            // ============================================
+            // SANDBOX PRACTICE PROBLEMS
+            // ============================================
+            19: {
+                title: "Sandbox Practice 1: Movie Analysis",
+                db: "movies_boxoffice",
+                content: `
+                    <p>Congratulations on completing all the lessons! Now it's time to put your skills to the test with some comprehensive practice problems.</p>
+
+                    <p>In this sandbox, you have access to both the <code>movies</code> and <code>boxoffice</code> tables. Use everything you've learned about SELECT, WHERE, JOINs, and aggregates to answer the questions below.</p>
+
+                    <h3>Available Tables</h3>
+                    <p>You're working with the Pixar movies database:</p>
+                    <ul>
+                        <li><strong>movies</strong>: id, title, director, year, length_minutes</li>
+                        <li><strong>boxoffice</strong>: movie_id, rating, domestic_sales, international_sales</li>
+                    </ul>
+
+                    <div class="warning-box">
+                        <strong>Tip:</strong> These problems require combining multiple concepts. Think about which clauses you need and in what order they should appear.
+                    </div>
+                `,
+                exercises: [
+                    "Find all movies directed by John Lasseter that were released after 2000, showing only the title and year",
+                    "List all movies with their total worldwide sales (domestic + international), sorted by total sales descending",
+                    "Find the average movie length for each director, but only show directors who have directed more than 1 movie",
+                    "Which movie has the highest rating? Show the title and rating",
+                    "Find all movies where international sales exceeded domestic sales by more than 100 million dollars"
+                ]
+            },
+            20: {
+                title: "Sandbox Practice 2: Employee Reports",
+                db: "employees",
+                content: `
+                    <p>In this practice session, you'll work with the employees database to generate various reports that a manager might need.</p>
+
+                    <h3>Available Tables</h3>
+                    <ul>
+                        <li><strong>employees</strong>: id, name, role, building, years_employed</li>
+                        <li><strong>buildings</strong>: building_name, capacity</li>
+                    </ul>
+
+                    <p>These exercises will test your understanding of JOINs, GROUP BY, HAVING, and NULL handling.</p>
+
+                    <div class="warning-box">
+                        <strong>Remember:</strong> When dealing with employees who might not have a building assigned, you'll need to use OUTER JOINs and IS NULL checks.
+                    </div>
+                `,
+                exercises: [
+                    "List all employees along with their building's capacity. Include employees even if they don't have a building assigned (show NULL for capacity)",
+                    "Find the total years of experience for each role, ordered from most to least experience",
+                    "Which buildings are operating at more than 50% capacity? Show building name, capacity, and number of employees",
+                    "Find all roles that have an average tenure of more than 5 years",
+                    "List the names of employees who have worked longer than the average tenure across all employees"
+                ]
+            },
+            21: {
+                title: "Sandbox Practice 3: Data Manipulation",
+                db: "movies_boxoffice",
+                content: `
+                    <p>This practice session focuses on modifying data using INSERT, UPDATE, and DELETE statements. You'll also work with expressions and aliases.</p>
+
+                    <h3>Available Tables</h3>
+                    <ul>
+                        <li><strong>movies</strong>: id, title, director, year, length_minutes</li>
+                        <li><strong>boxoffice</strong>: movie_id, rating, domestic_sales, international_sales</li>
+                    </ul>
+
+                    <div class="warning-box">
+                        <strong>Caution:</strong> Always double-check your WHERE clauses before running UPDATE or DELETE statements! Test with a SELECT first if you're unsure.
+                    </div>
+
+                    <p>After making changes, use SELECT statements to verify your modifications worked correctly.</p>
+                `,
+                exercises: [
+                    "Add a new movie: 'Inside Out' directed by 'Pete Docter', released in 2015, with a length of 95 minutes (use id 15)",
+                    "Add a box office record for Inside Out: rating 8.1, domestic sales 356,461,711, international sales 501,100,000",
+                    "The length of 'Cars' (id 7) was recorded incorrectly. Update it to 116 minutes",
+                    "Update all movies directed by 'Brad Bird' to have an additional 1 minute added to their length",
+                    "Delete all movies released before 1999 from the database"
+                ]
+            },
+            22: {
+                title: "Sandbox Practice 4: Complex Queries",
+                db: "sandbox",
+                content: `
+                    <p>These advanced exercises require combining multiple SQL concepts in single queries. You'll need to use subqueries, multiple JOINs, and complex filtering.</p>
+
+                    <h3>Available Tables</h3>
+                    <p>You have access to ALL tables from the course:</p>
+                    <ul>
+                        <li><strong>movies</strong>: id, title, director, year, length_minutes</li>
+                        <li><strong>boxoffice</strong>: movie_id, rating, domestic_sales, international_sales</li>
+                        <li><strong>employees</strong>: id, name, role, building, years_employed</li>
+                        <li><strong>buildings</strong>: building_name, capacity</li>
+                        <li><strong>north_american_cities</strong>: city, country, population, latitude, longitude</li>
+                    </ul>
+
+                    <div class="warning-box">
+                        <strong>Challenge:</strong> These problems may require multiple steps or subqueries. Think about breaking down complex problems into smaller parts.
+                    </div>
+                `,
+                exercises: [
+                    "Find all directors whose movies have an average rating above 8.0. Show the director name and their average rating",
+                    "List all cities that have a larger population than Houston (use a subquery to find Houston's population first)",
+                    "For each building, show the building name, its capacity, number of employees, and the percentage of capacity used (round to 1 decimal)",
+                    "Find the director(s) who made the movie with the highest total worldwide sales",
+                    "List all employees who work in buildings with capacity greater than 30, grouped by their role, showing the count per role"
+                ]
+            },
+            23: {
+                title: "Sandbox Practice 5: Final Challenge",
+                db: "sandbox",
+                content: `
+                    <p>Welcome to the final challenge! These exercises will test everything you've learned throughout the course. Each problem requires combining multiple concepts.</p>
+
+                    <h3>Available Tables</h3>
+                    <p>All tables are available:</p>
+                    <ul>
+                        <li><strong>movies</strong> & <strong>boxoffice</strong> (Pixar movies data)</li>
+                        <li><strong>employees</strong> & <strong>buildings</strong> (Company data)</li>
+                        <li><strong>north_american_cities</strong> (Geography data)</li>
+                    </ul>
+
+                    <h3>Concepts Tested</h3>
+                    <p>SELECT, WHERE, ORDER BY, LIMIT, DISTINCT, JOINs, GROUP BY, HAVING, Aggregates, Expressions, INSERT, UPDATE, DELETE</p>
+
+                    <div class="warning-box">
+                        <strong>Final Boss:</strong> These are designed to be challenging. Take your time and build your queries step by step!
+                    </div>
+                `,
+                exercises: [
+                    "Create a report showing each director, their number of movies, total worldwide sales, and average rating. Only include directors with more than 1 movie. Sort by total sales descending",
+                    "Find the top 3 highest-rated movies that were released in odd-numbered years. Show title, year, and rating",
+                    "For cities in the United States, calculate what percentage of the total US city population each city represents. Show city name and percentage (rounded to 2 decimals), sorted by percentage descending",
+                    "List all buildings that either have no employees OR have employees with a combined experience of less than 10 years. Show building name and total years (use 0 for empty buildings)",
+                    "Write a query that shows for each decade (1990s, 2000s, 2010s) the number of movies released and the average movie length. Hint: Use integer division (year/10*10) to group by decade"
+                ]
             }
         };
 
@@ -1181,7 +1329,7 @@ RENAME TO new_table_name;</div>
             db.run("DROP TABLE IF EXISTS buildings");
             db.run("DROP TABLE IF EXISTS Database");
 
-            if (dbType === "movies" || dbType === "movies_boxoffice") {
+            if (dbType === "movies" || dbType === "movies_boxoffice" || dbType === "sandbox") {
                 db.run(`CREATE TABLE movies (
                     id INTEGER PRIMARY KEY,
                     title TEXT,
@@ -1194,7 +1342,7 @@ RENAME TO new_table_name;</div>
                 });
             }
 
-            if (dbType === "movies_boxoffice") {
+            if (dbType === "movies_boxoffice" || dbType === "sandbox") {
                 db.run(`CREATE TABLE boxoffice (
                     movie_id INTEGER PRIMARY KEY,
                     rating REAL,
@@ -1206,7 +1354,7 @@ RENAME TO new_table_name;</div>
                 });
             }
 
-            if (dbType === "cities") {
+            if (dbType === "cities" || dbType === "sandbox") {
                 db.run(`CREATE TABLE north_american_cities (
                     city TEXT,
                     country TEXT,
@@ -1219,7 +1367,7 @@ RENAME TO new_table_name;</div>
                 });
             }
 
-            if (dbType === "employees") {
+            if (dbType === "employees" || dbType === "sandbox") {
                 db.run(`CREATE TABLE employees (
                     id INTEGER PRIMARY KEY,
                     name TEXT,
@@ -1293,6 +1441,27 @@ RENAME TO new_table_name;</div>
                 );
             } else if (dbType === "empty") {
                 html = '<p><em>No tables yet - this lesson is about creating tables!</em></p>';
+            } else if (dbType === "sandbox") {
+                html += renderDataTable('Movies',
+                    ['id', 'title', 'director', 'year', 'length_minutes'],
+                    movieData
+                );
+                html += renderDataTable('Boxoffice',
+                    ['movie_id', 'rating', 'domestic_sales', 'international_sales'],
+                    boxofficeData
+                );
+                html += renderDataTable('Employees',
+                    ['id', 'name', 'role', 'building', 'years_employed'],
+                    employeeData
+                );
+                html += renderDataTable('Buildings',
+                    ['building_name', 'capacity'],
+                    buildingData
+                );
+                html += renderDataTable('North_american_cities',
+                    ['city', 'country', 'population', 'latitude', 'longitude'],
+                    cityData
+                );
             }
 
             dataTablesArea.innerHTML = html;
@@ -1335,6 +1504,8 @@ RENAME TO new_table_name;</div>
                 document.getElementById('sqlEditor').value = "SELECT * FROM north_american_cities;";
             } else if (lesson.db === "employees") {
                 document.getElementById('sqlEditor').value = "SELECT * FROM employees;";
+            } else if (lesson.db === "sandbox") {
+                document.getElementById('sqlEditor').value = "-- All tables available: movies, boxoffice, employees, buildings, north_american_cities\nSELECT * FROM movies;";
             } else {
                 document.getElementById('sqlEditor').value = "";
             }
