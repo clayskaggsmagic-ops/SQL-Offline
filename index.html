@@ -1,0 +1,1494 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SQLBolt Offline - Learn SQL</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, sans-serif;
+            background: #f5f5f5;
+            color: #333;
+            line-height: 1.6;
+        }
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+        /* Sidebar */
+        .sidebar {
+            width: 280px;
+            background: #2c3e50;
+            color: white;
+            padding: 20px 0;
+            overflow-y: auto;
+            position: fixed;
+            height: 100vh;
+        }
+        .sidebar h1 {
+            font-size: 1.5em;
+            padding: 0 20px 20px;
+            border-bottom: 1px solid #34495e;
+            margin-bottom: 10px;
+        }
+        .sidebar h1 span {
+            color: #3498db;
+        }
+        .lesson-group {
+            margin: 10px 0;
+        }
+        .lesson-group-title {
+            padding: 10px 20px;
+            font-size: 0.8em;
+            text-transform: uppercase;
+            color: #7f8c8d;
+            letter-spacing: 1px;
+        }
+        .lesson-link {
+            display: block;
+            padding: 10px 20px;
+            color: #bdc3c7;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .lesson-link:hover {
+            background: #34495e;
+            color: white;
+        }
+        .lesson-link.active {
+            background: #3498db;
+            color: white;
+        }
+        .lesson-link.completed::before {
+            content: "✓ ";
+            color: #2ecc71;
+        }
+        /* Main content */
+        .main {
+            margin-left: 280px;
+            flex: 1;
+            padding: 30px;
+            max-width: 900px;
+        }
+        .lesson-title {
+            font-size: 2em;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #3498db;
+        }
+        .lesson-content {
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .lesson-content h3 {
+            color: #2c3e50;
+            margin: 20px 0 10px;
+        }
+        .lesson-content h3:first-child {
+            margin-top: 0;
+        }
+        .lesson-content p {
+            margin: 10px 0;
+        }
+        .lesson-content code {
+            background: #ecf0f1;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: "SF Mono", Monaco, Consolas, monospace;
+            font-size: 0.9em;
+        }
+        .syntax-box {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: "SF Mono", Monaco, Consolas, monospace;
+            margin: 15px 0;
+            overflow-x: auto;
+        }
+        .operator-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+        .operator-table th, .operator-table td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+        .operator-table th {
+            background: #3498db;
+            color: white;
+        }
+        .operator-table tr:nth-child(even) {
+            background: #f9f9f9;
+        }
+        .operator-table code {
+            background: #e8e8e8;
+        }
+        /* Data tables section */
+        .data-tables-section {
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .data-tables-section h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+        .data-tables-section h4 {
+            color: #34495e;
+            margin: 15px 0 10px;
+            font-size: 1em;
+        }
+        .data-tables-section h4:first-child {
+            margin-top: 0;
+        }
+        .preview-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85em;
+            margin-bottom: 20px;
+        }
+        .preview-table th {
+            background: #3498db;
+            color: white;
+            padding: 8px 10px;
+            text-align: left;
+            font-weight: 600;
+        }
+        .preview-table td {
+            padding: 6px 10px;
+            border-bottom: 1px solid #eee;
+        }
+        .preview-table tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+        /* Exercises section */
+        .exercises {
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .exercises h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+        .exercise-item {
+            padding: 10px 15px;
+            margin: 8px 0;
+            background: #f8f9fa;
+            border-left: 4px solid #3498db;
+            border-radius: 0 5px 5px 0;
+        }
+        .exercise-item.completed {
+            border-left-color: #2ecc71;
+            background: #e8f8f0;
+        }
+        .exercise-num {
+            font-weight: bold;
+            color: #3498db;
+        }
+        .exercise-item.completed .exercise-num {
+            color: #2ecc71;
+        }
+        /* SQL Editor */
+        .editor-section {
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .editor-section h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+        .sql-editor {
+            width: 100%;
+            height: 120px;
+            font-family: "SF Mono", Monaco, Consolas, monospace;
+            font-size: 14px;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            resize: vertical;
+            background: #fafafa;
+        }
+        .sql-editor:focus {
+            border-color: #3498db;
+            outline: none;
+            background: white;
+        }
+        .btn-row {
+            margin-top: 15px;
+            display: flex;
+            gap: 10px;
+        }
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+        .btn-primary {
+            background: #3498db;
+            color: white;
+        }
+        .btn-primary:hover {
+            background: #2980b9;
+        }
+        .btn-secondary {
+            background: #95a5a6;
+            color: white;
+        }
+        .btn-secondary:hover {
+            background: #7f8c8d;
+        }
+        .btn-success {
+            background: #2ecc71;
+            color: white;
+        }
+        /* Results */
+        .results-section {
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .results-section h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+        .results-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        .results-table th {
+            background: #34495e;
+            color: white;
+            padding: 10px;
+            text-align: left;
+            font-weight: 600;
+        }
+        .results-table td {
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        .results-table tr:nth-child(even) {
+            background: #f9f9f9;
+        }
+        .results-table tr:hover {
+            background: #f1f1f1;
+        }
+        .message {
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .message.info {
+            background: #e7f3ff;
+            color: #004085;
+            border: 1px solid #b8daff;
+        }
+        .row-count {
+            color: #7f8c8d;
+            font-size: 0.9em;
+            margin-top: 10px;
+        }
+        /* Data table preview */
+        .data-preview {
+            margin: 20px 0;
+            overflow-x: auto;
+        }
+        .data-preview h4 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9em;
+        }
+        .data-table th {
+            background: #ecf0f1;
+            padding: 8px;
+            text-align: left;
+            font-weight: 600;
+            border: 1px solid #ddd;
+        }
+        .data-table td {
+            padding: 8px;
+            border: 1px solid #ddd;
+        }
+        /* Warning box */
+        .warning-box {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            border-radius: 0 5px 5px 0;
+            margin: 15px 0;
+        }
+        .warning-box strong {
+            color: #856404;
+        }
+        /* Keyboard shortcut hint */
+        .shortcut-hint {
+            color: #7f8c8d;
+            font-size: 0.85em;
+            margin-top: 8px;
+        }
+        .shortcut-hint kbd {
+            background: #eee;
+            padding: 2px 6px;
+            border-radius: 3px;
+            border: 1px solid #ccc;
+            font-family: inherit;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <nav class="sidebar">
+            <h1>SQL<span>Bolt</span> Offline</h1>
+
+            <div class="lesson-group">
+                <div class="lesson-group-title">Introduction</div>
+                <a class="lesson-link" data-lesson="1">Lesson 1: SELECT Basics</a>
+            </div>
+
+            <div class="lesson-group">
+                <div class="lesson-group-title">Queries</div>
+                <a class="lesson-link" data-lesson="2">Lesson 2: Constraints (Numbers)</a>
+                <a class="lesson-link" data-lesson="3">Lesson 3: Constraints (Text)</a>
+                <a class="lesson-link" data-lesson="4">Lesson 4: Filtering & Sorting</a>
+                <a class="lesson-link" data-lesson="5">Lesson 5: Review</a>
+            </div>
+
+            <div class="lesson-group">
+                <div class="lesson-group-title">Multi-table Queries</div>
+                <a class="lesson-link" data-lesson="6">Lesson 6: JOINs</a>
+                <a class="lesson-link" data-lesson="7">Lesson 7: OUTER JOINs</a>
+                <a class="lesson-link" data-lesson="8">Lesson 8: NULLs</a>
+            </div>
+
+            <div class="lesson-group">
+                <div class="lesson-group-title">Expressions & Aggregates</div>
+                <a class="lesson-link" data-lesson="9">Lesson 9: Expressions</a>
+                <a class="lesson-link" data-lesson="10">Lesson 10: Aggregates Pt. 1</a>
+                <a class="lesson-link" data-lesson="11">Lesson 11: Aggregates Pt. 2</a>
+                <a class="lesson-link" data-lesson="12">Lesson 12: Order of Execution</a>
+            </div>
+
+            <div class="lesson-group">
+                <div class="lesson-group-title">Modifying Data</div>
+                <a class="lesson-link" data-lesson="13">Lesson 13: INSERT</a>
+                <a class="lesson-link" data-lesson="14">Lesson 14: UPDATE</a>
+                <a class="lesson-link" data-lesson="15">Lesson 15: DELETE</a>
+            </div>
+
+            <div class="lesson-group">
+                <div class="lesson-group-title">Table Management</div>
+                <a class="lesson-link" data-lesson="16">Lesson 16: CREATE TABLE</a>
+                <a class="lesson-link" data-lesson="17">Lesson 17: ALTER TABLE</a>
+                <a class="lesson-link" data-lesson="18">Lesson 18: DROP TABLE</a>
+            </div>
+        </nav>
+
+        <main class="main">
+            <h1 class="lesson-title" id="lessonTitle">Loading...</h1>
+
+            <div class="lesson-content" id="lessonContent">
+                <!-- Lesson content injected here -->
+            </div>
+
+            <div class="data-tables-section" id="dataTablesSection">
+                <h3>Table Data</h3>
+                <div id="dataTablesArea">
+                    <!-- Data tables injected here -->
+                </div>
+            </div>
+
+            <div class="exercises" id="exercisesSection">
+                <h3>Exercises</h3>
+                <div id="exerciseList">
+                    <!-- Exercises injected here -->
+                </div>
+            </div>
+
+            <div class="editor-section">
+                <h3>SQL Editor</h3>
+                <textarea class="sql-editor" id="sqlEditor" placeholder="Write your SQL query here...">SELECT * FROM movies;</textarea>
+                <div class="btn-row">
+                    <button class="btn btn-primary" id="runBtn">Run Query</button>
+                    <button class="btn btn-secondary" id="resetBtn">Reset Database</button>
+                </div>
+                <div class="shortcut-hint">
+                    Press <kbd>Ctrl</kbd>+<kbd>Enter</kbd> (or <kbd>Cmd</kbd>+<kbd>Enter</kbd>) to run
+                </div>
+            </div>
+
+            <div class="results-section">
+                <h3>Results</h3>
+                <div id="resultsArea">
+                    <div class="message info">Run a query to see results</div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="sql-wasm.js"></script>
+    <script>
+        // ============================================
+        // LESSON DATA
+        // ============================================
+        const lessons = {
+            1: {
+                title: "SQL Lesson 1: SELECT Queries Introduction",
+                db: "movies",
+                content: `
+                    <h3>What is SQL?</h3>
+                    <p>SQL, or Structured Query Language, is a language designed to allow both technical and non-technical users to query, manipulate, and transform data from a relational database.</p>
+
+                    <h3>Relational Databases</h3>
+                    <p>A relational database represents a collection of related tables. Each table has a fixed number of named columns and any number of rows of data.</p>
+
+                    <h3>SELECT Queries</h3>
+                    <p>To retrieve data from a SQL database, we use <code>SELECT</code> statements, often called queries. A query declares what data we are looking for, where to find it, and optionally how to transform it.</p>
+
+                    <h3>Selecting Specific Columns</h3>
+                    <div class="syntax-box">SELECT column, another_column, ... FROM table_name;</div>
+                    <p>The result will be a table with only the columns you selected.</p>
+
+                    <h3>Selecting All Columns</h3>
+                    <div class="syntax-box">SELECT * FROM table_name;</div>
+                    <p>The asterisk (*) is a shortcut to select all columns.</p>
+
+                    <div class="data-preview">
+                        <h4>Movies Table</h4>
+                        <p>For this lesson, you'll be working with a table of Pixar movies:</p>
+                    </div>
+                `,
+                exercises: [
+                    "Find the <code>title</code> of each film",
+                    "Find the <code>director</code> of each film",
+                    "Find the <code>title</code> and <code>director</code> of each film",
+                    "Find the <code>title</code> and <code>year</code> of each film",
+                    "Find <strong>all</strong> the information about each film"
+                ]
+            },
+            2: {
+                title: "SQL Lesson 2: Queries with Constraints (Part 1)",
+                db: "movies",
+                content: `
+                    <h3>Filtering Results with WHERE</h3>
+                    <p>To filter certain rows from being returned, we use a <code>WHERE</code> clause. The clause is applied to each row of data by checking specific column values.</p>
+
+                    <div class="syntax-box">SELECT column, another_column, ...
+FROM table_name
+WHERE condition
+    AND/OR another_condition
+    AND/OR ...;</div>
+
+                    <h3>Numeric Operators</h3>
+                    <table class="operator-table">
+                        <tr><th>Operator</th><th>Condition</th><th>SQL Example</th></tr>
+                        <tr><td><code>=, !=, &lt;, &lt;=, &gt;, &gt;=</code></td><td>Standard numerical operators</td><td><code>col != 4</code></td></tr>
+                        <tr><td><code>BETWEEN ... AND ...</code></td><td>Number within range (inclusive)</td><td><code>col BETWEEN 1.5 AND 10.5</code></td></tr>
+                        <tr><td><code>NOT BETWEEN ... AND ...</code></td><td>Number NOT within range</td><td><code>col NOT BETWEEN 1 AND 10</code></td></tr>
+                        <tr><td><code>IN (...)</code></td><td>Number exists in a list</td><td><code>col IN (2, 4, 6)</code></td></tr>
+                        <tr><td><code>NOT IN (...)</code></td><td>Number NOT in a list</td><td><code>col NOT IN (1, 3, 5)</code></td></tr>
+                    </table>
+
+                    <h3>Combining Conditions</h3>
+                    <p>You can combine multiple conditions using <code>AND</code> or <code>OR</code>:</p>
+                    <div class="syntax-box">SELECT * FROM movies WHERE year >= 2000 AND year <= 2010;</div>
+                `,
+                exercises: [
+                    "Find the movie with a row <code>id</code> of 6",
+                    "Find the movies released in the years <code>BETWEEN</code> 2000 and 2010",
+                    "Find the movies <strong>NOT</strong> released in the years between 2000 and 2010",
+                    "Find the first 5 Pixar movies and their release <code>year</code>"
+                ]
+            },
+            3: {
+                title: "SQL Lesson 3: Queries with Constraints (Part 2)",
+                db: "movies",
+                content: `
+                    <h3>Text/String Operators</h3>
+                    <p>When working with text data, SQL provides special operators for pattern matching and comparison:</p>
+
+                    <table class="operator-table">
+                        <tr><th>Operator</th><th>Condition</th><th>Example</th></tr>
+                        <tr><td><code>=</code></td><td>Case sensitive exact match</td><td><code>col = "abc"</code></td></tr>
+                        <tr><td><code>!= or &lt;&gt;</code></td><td>Case sensitive inequality</td><td><code>col != "xyz"</code></td></tr>
+                        <tr><td><code>LIKE</code></td><td>Case insensitive match</td><td><code>col LIKE "ABC"</code></td></tr>
+                        <tr><td><code>NOT LIKE</code></td><td>Case insensitive non-match</td><td><code>col NOT LIKE "xyz"</code></td></tr>
+                        <tr><td><code>%</code></td><td>Match sequence of 0+ characters (wildcard)</td><td><code>col LIKE "%AT%"</code> matches "CAT", "BAT", "AT"</td></tr>
+                        <tr><td><code>_</code></td><td>Match a single character (wildcard)</td><td><code>col LIKE "AN_"</code> matches "AND" not "AN"</td></tr>
+                        <tr><td><code>IN (...)</code></td><td>String in list</td><td><code>col IN ("A", "B", "C")</code></td></tr>
+                        <tr><td><code>NOT IN (...)</code></td><td>String NOT in list</td><td><code>col NOT IN ("X", "Y")</code></td></tr>
+                    </table>
+
+                    <div class="warning-box">
+                        <strong>Important:</strong> All strings must be quoted so the query parser can distinguish them from SQL keywords!
+                    </div>
+
+                    <h3>Pattern Matching Examples</h3>
+                    <div class="syntax-box">-- Find movies starting with "Toy"
+SELECT * FROM movies WHERE title LIKE "Toy%";
+
+-- Find movies with exactly 4-letter titles
+SELECT * FROM movies WHERE title LIKE "____";</div>
+                `,
+                exercises: [
+                    "Find all the Toy Story movies",
+                    "Find all the movies directed by John Lasseter",
+                    "Find all the movies (and director) <strong>not</strong> directed by John Lasseter",
+                    "Find all the WALL-* movies"
+                ]
+            },
+            4: {
+                title: "SQL Lesson 4: Filtering and Sorting Query Results",
+                db: "movies",
+                content: `
+                    <h3>Removing Duplicates with DISTINCT</h3>
+                    <p>SQL provides the <code>DISTINCT</code> keyword to remove duplicate rows from results:</p>
+                    <div class="syntax-box">SELECT DISTINCT column, another_column, ...
+FROM table_name
+WHERE condition(s);</div>
+
+                    <h3>Ordering Results</h3>
+                    <p>Use <code>ORDER BY</code> to sort results by a column in ascending (<code>ASC</code>) or descending (<code>DESC</code>) order:</p>
+                    <div class="syntax-box">SELECT column, another_column, ...
+FROM table_name
+WHERE condition(s)
+ORDER BY column ASC/DESC;</div>
+
+                    <h3>Limiting Results</h3>
+                    <p><code>LIMIT</code> reduces the number of rows returned. <code>OFFSET</code> specifies where to begin counting:</p>
+                    <div class="syntax-box">SELECT column, another_column, ...
+FROM table_name
+WHERE condition(s)
+ORDER BY column ASC/DESC
+LIMIT num_limit OFFSET num_offset;</div>
+
+                    <p><code>LIMIT</code> and <code>OFFSET</code> are commonly used for pagination (like page 1, page 2, etc. of search results).</p>
+                `,
+                exercises: [
+                    "List all directors of Pixar movies (alphabetically), without duplicates",
+                    "List the last four Pixar movies released (ordered from most recent to least)",
+                    "List the <strong>first</strong> five Pixar movies sorted alphabetically",
+                    "List the <strong>next</strong> five Pixar movies sorted alphabetically"
+                ]
+            },
+            5: {
+                title: "SQL Review: Simple SELECT Queries",
+                db: "cities",
+                content: `
+                    <h3>Review Time!</h3>
+                    <p>You've learned the basics of SELECT queries. Let's practice with a different dataset - North American cities!</p>
+
+                    <h3>Quick Reference</h3>
+                    <div class="syntax-box">SELECT DISTINCT column, AGG_FUNC(column_or_expression), ...
+FROM table_name
+WHERE constraint_expression
+ORDER BY column ASC/DESC
+LIMIT count OFFSET offset;</div>
+
+                    <div class="data-preview">
+                        <h4>North American Cities Table</h4>
+                        <p>This table contains major cities with their country, population, and coordinates:</p>
+                        <ul>
+                            <li><strong>city</strong> - Name of the city</li>
+                            <li><strong>country</strong> - "USA", "Canada", or "Mexico"</li>
+                            <li><strong>population</strong> - City population</li>
+                            <li><strong>latitude</strong> - Geographic latitude (positive = north)</li>
+                            <li><strong>longitude</strong> - Geographic longitude (negative = west)</li>
+                        </ul>
+                    </div>
+
+                    <p><strong>Hint:</strong> Chicago's longitude is approximately -87.65</p>
+                `,
+                exercises: [
+                    "List all the Canadian cities and their populations",
+                    "Order all the cities in the United States by their latitude from north to south",
+                    "List all the cities west of Chicago, ordered from west to east",
+                    "List the two largest cities in Mexico (by population)",
+                    "List the third and fourth largest cities (by population) in the United States and their population"
+                ]
+            },
+            6: {
+                title: "SQL Lesson 6: Multi-table Queries with JOINs",
+                db: "movies_boxoffice",
+                content: `
+                    <h3>Database Normalization</h3>
+                    <p>In real databases, data is often split across multiple tables to reduce redundancy. This is called <strong>normalization</strong>. Tables are linked by <strong>primary keys</strong> - unique identifiers for each row.</p>
+
+                    <h3>INNER JOIN</h3>
+                    <p>The <code>INNER JOIN</code> combines rows from two tables where the join condition is met:</p>
+
+                    <div class="syntax-box">SELECT column, another_table_column, ...
+FROM mytable
+INNER JOIN another_table
+    ON mytable.id = another_table.id
+WHERE condition(s)
+ORDER BY column ASC/DESC
+LIMIT num_limit OFFSET num_offset;</div>
+
+                    <p>The <code>INNER JOIN</code> matches rows from the first table with rows from the second table that have matching values (specified in <code>ON</code>). The result combines columns from both tables.</p>
+
+                    <div class="data-preview">
+                        <h4>Tables for this Lesson</h4>
+                        <p><strong>Movies:</strong> id, title, director, year, length_minutes</p>
+                        <p><strong>Boxoffice:</strong> movie_id, rating, domestic_sales, international_sales</p>
+                        <p>The <code>movie_id</code> in Boxoffice references the <code>id</code> in Movies.</p>
+                    </div>
+                `,
+                exercises: [
+                    "Find the domestic and international sales for each movie",
+                    "Show the sales numbers for each movie that did better internationally rather than domestically",
+                    "List all the movies by their ratings in descending order"
+                ]
+            },
+            7: {
+                title: "SQL Lesson 7: OUTER JOINs",
+                db: "employees",
+                content: `
+                    <h3>When INNER JOIN Isn't Enough</h3>
+                    <p>If two tables have asymmetric data (rows in one table don't all have matches in the other), <code>INNER JOIN</code> would exclude those unmatched rows.</p>
+
+                    <h3>LEFT, RIGHT, and FULL JOINs</h3>
+                    <table class="operator-table">
+                        <tr><th>Join Type</th><th>Description</th></tr>
+                        <tr><td><code>LEFT JOIN</code></td><td>Keeps ALL rows from the <strong>left</strong> table, with matching data from the right (NULL if no match)</td></tr>
+                        <tr><td><code>RIGHT JOIN</code></td><td>Keeps ALL rows from the <strong>right</strong> table, with matching data from the left</td></tr>
+                        <tr><td><code>FULL JOIN</code></td><td>Keeps ALL rows from <strong>both</strong> tables</td></tr>
+                    </table>
+
+                    <div class="syntax-box">SELECT column, another_column, ...
+FROM mytable
+LEFT/RIGHT/FULL JOIN another_table
+    ON mytable.id = another_table.matching_id
+WHERE condition(s);</div>
+
+                    <div class="warning-box">
+                        <strong>Note:</strong> SQLite (used here) only supports LEFT JOIN. RIGHT and FULL JOINs can be simulated by swapping table order or using UNION.
+                    </div>
+
+                    <div class="data-preview">
+                        <h4>Tables for this Lesson</h4>
+                        <p><strong>Employees:</strong> id, name, role, building, years_employed</p>
+                        <p><strong>Buildings:</strong> building_name, capacity</p>
+                    </div>
+                `,
+                exercises: [
+                    "Find the list of all buildings that have employees",
+                    "Find the list of all buildings and their capacity",
+                    "List all buildings and the distinct employee roles in each building (including empty buildings)"
+                ]
+            },
+            8: {
+                title: "SQL Lesson 8: A Short Note on NULLs",
+                db: "employees",
+                content: `
+                    <h3>What is NULL?</h3>
+                    <p><code>NULL</code> represents missing or unknown data. It's different from zero or an empty string - it means "no value".</p>
+
+                    <h3>Testing for NULL</h3>
+                    <p>You cannot use <code>=</code> or <code>!=</code> to test for NULL. Instead, use:</p>
+
+                    <div class="syntax-box">SELECT column, another_column, ...
+FROM table_name
+WHERE column IS NULL;
+
+-- Or to find non-null values:
+WHERE column IS NOT NULL;</div>
+
+                    <h3>When to Expect NULLs</h3>
+                    <ul>
+                        <li>Data that wasn't collected (e.g., optional fields)</li>
+                        <li>Results from OUTER JOINs where no match was found</li>
+                        <li>Placeholder for data to be added later</li>
+                    </ul>
+
+                    <div class="warning-box">
+                        <strong>Tip:</strong> It's good practice to reduce NULLs where possible, as they require special handling and can lead to unexpected results in calculations.
+                    </div>
+                `,
+                exercises: [
+                    "Find the name and role of all employees who have <strong>not</strong> been assigned to a building",
+                    "Find the names of the buildings that hold no employees"
+                ]
+            },
+            9: {
+                title: "SQL Lesson 9: Queries with Expressions",
+                db: "movies_boxoffice",
+                content: `
+                    <h3>Using Expressions</h3>
+                    <p>SQL allows you to use expressions (mathematical operations, string functions, etc.) to transform data as you query it:</p>
+
+                    <div class="syntax-box">SELECT col_expression AS alias, ...
+FROM table_name;</div>
+
+                    <h3>Examples of Expressions</h3>
+                    <div class="syntax-box">-- Math operations
+SELECT title, (domestic_sales + international_sales) / 1000000 AS millions
+FROM movies JOIN boxoffice ON id = movie_id;
+
+-- In WHERE clause
+SELECT * FROM movies WHERE year % 2 = 0;  -- Even years only</div>
+
+                    <h3>Column Aliases with AS</h3>
+                    <p>Use <code>AS</code> to give columns readable names:</p>
+                    <div class="syntax-box">SELECT column AS better_name FROM table_name;</div>
+
+                    <h3>Table Aliases</h3>
+                    <p>You can also alias table names to make queries shorter:</p>
+                    <div class="syntax-box">SELECT m.title, b.rating
+FROM movies AS m
+JOIN boxoffice AS b ON m.id = b.movie_id;</div>
+                `,
+                exercises: [
+                    "List all movies and their combined sales in <strong>millions</strong> of dollars",
+                    "List all movies and their ratings <strong>in percent</strong>",
+                    "List all movies that were released on even numbered years"
+                ]
+            },
+            10: {
+                title: "SQL Lesson 10: Queries with Aggregates (Part 1)",
+                db: "employees",
+                content: `
+                    <h3>Aggregate Functions</h3>
+                    <p>Aggregate functions let you summarize data across multiple rows:</p>
+
+                    <table class="operator-table">
+                        <tr><th>Function</th><th>Description</th></tr>
+                        <tr><td><code>COUNT(*)</code></td><td>Count all rows</td></tr>
+                        <tr><td><code>COUNT(column)</code></td><td>Count non-NULL values in column</td></tr>
+                        <tr><td><code>MIN(column)</code></td><td>Find the smallest value</td></tr>
+                        <tr><td><code>MAX(column)</code></td><td>Find the largest value</td></tr>
+                        <tr><td><code>AVG(column)</code></td><td>Calculate the average</td></tr>
+                        <tr><td><code>SUM(column)</code></td><td>Calculate the total</td></tr>
+                    </table>
+
+                    <h3>Basic Usage</h3>
+                    <div class="syntax-box">SELECT AGG_FUNC(column) AS description
+FROM table_name
+WHERE condition;</div>
+
+                    <h3>Grouping with GROUP BY</h3>
+                    <p>To apply aggregates to groups of rows:</p>
+                    <div class="syntax-box">SELECT column, AGG_FUNC(column) AS description
+FROM table_name
+WHERE condition
+GROUP BY column;</div>
+
+                    <p>This groups rows with the same value in the specified column, then applies the aggregate to each group.</p>
+                `,
+                exercises: [
+                    "Find the longest time that an employee has been at the studio",
+                    "For each role, find the average number of years employed by employees in that role",
+                    "Find the total number of employee years worked in each building"
+                ]
+            },
+            11: {
+                title: "SQL Lesson 11: Queries with Aggregates (Part 2)",
+                db: "employees",
+                content: `
+                    <h3>Filtering Groups with HAVING</h3>
+                    <p>The <code>HAVING</code> clause filters groups <strong>after</strong> the <code>GROUP BY</code> aggregation. This is different from <code>WHERE</code>, which filters rows <strong>before</strong> grouping.</p>
+
+                    <div class="syntax-box">SELECT column, AGG_FUNC(column) AS alias
+FROM table_name
+WHERE condition          -- Filters rows BEFORE grouping
+GROUP BY column
+HAVING group_condition;  -- Filters groups AFTER aggregation</div>
+
+                    <h3>Example: WHERE vs HAVING</h3>
+                    <div class="syntax-box">-- Count employees per role, but only roles with more than 3 employees
+SELECT role, COUNT(*) AS num_employees
+FROM employees
+WHERE years_employed > 1        -- First: only employees with >1 year
+GROUP BY role
+HAVING COUNT(*) > 3;            -- Then: only roles with >3 people</div>
+
+                    <div class="warning-box">
+                        <strong>Remember:</strong> If you're not using GROUP BY, use WHERE instead of HAVING!
+                    </div>
+                `,
+                exercises: [
+                    "Find the number of Artists in the studio (without a HAVING clause)",
+                    "Find the number of Employees of each role in the studio",
+                    "Find the total number of years employed by all Engineers"
+                ]
+            },
+            12: {
+                title: "SQL Lesson 12: Order of Query Execution",
+                db: "movies_boxoffice",
+                content: `
+                    <h3>Query Execution Order</h3>
+                    <p>SQL doesn't execute queries in the order you write them. Understanding execution order helps you write correct queries:</p>
+
+                    <div class="syntax-box">1. FROM and JOINs    -- Tables are joined first
+2. WHERE             -- Rows are filtered
+3. GROUP BY          -- Rows are grouped
+4. HAVING            -- Groups are filtered
+5. SELECT            -- Columns are selected/computed
+6. DISTINCT          -- Duplicates are removed
+7. ORDER BY          -- Results are sorted
+8. LIMIT / OFFSET    -- Results are limited</div>
+
+                    <h3>Why This Matters</h3>
+                    <ul>
+                        <li>You can't use column aliases in WHERE (SELECT happens later)</li>
+                        <li>HAVING can use aggregates because GROUP BY happens first</li>
+                        <li>ORDER BY can use aliases because it runs after SELECT</li>
+                    </ul>
+
+                    <h3>Complete Query Template</h3>
+                    <div class="syntax-box">SELECT DISTINCT column, AGG_FUNC(column) AS alias, ...
+FROM table_name
+    JOIN another_table ON table_name.col = another_table.col
+WHERE constraint
+GROUP BY column
+HAVING constraint
+ORDER BY column ASC/DESC
+LIMIT count OFFSET offset;</div>
+                `,
+                exercises: [
+                    "Find the number of movies each director has directed",
+                    "Find the total domestic and international sales that can be attributed to each director"
+                ]
+            },
+            13: {
+                title: "SQL Lesson 13: Inserting Rows",
+                db: "movies_boxoffice",
+                content: `
+                    <h3>Database Schema</h3>
+                    <p>A database <strong>schema</strong> defines the structure of each table - what columns exist and what types of data they can hold. INSERT statements must match this schema.</p>
+
+                    <h3>INSERT Syntax</h3>
+                    <p><strong>Insert with all columns (in order):</strong></p>
+                    <div class="syntax-box">INSERT INTO table_name
+VALUES (value1, value2, ...);</div>
+
+                    <p><strong>Insert with specific columns:</strong></p>
+                    <div class="syntax-box">INSERT INTO table_name
+(column1, column2, ...)
+VALUES (value1, value2, ...);</div>
+
+                    <h3>Multiple Rows</h3>
+                    <div class="syntax-box">INSERT INTO table_name
+VALUES
+    (val1, val2, ...),
+    (val1, val2, ...),
+    (val1, val2, ...);</div>
+
+                    <h3>Expressions in INSERT</h3>
+                    <p>You can use expressions to compute values:</p>
+                    <div class="syntax-box">INSERT INTO boxoffice (movie_id, rating, sales)
+VALUES (1, 9.9, 283742034 / 1000000);</div>
+
+                    <div class="data-preview">
+                        <h4>Movies Schema</h4>
+                        <p><code>id (INT), title (TEXT), director (TEXT), year (INT), length_minutes (INT)</code></p>
+                        <h4>Boxoffice Schema</h4>
+                        <p><code>movie_id (INT), rating (REAL), domestic_sales (INT), international_sales (INT)</code></p>
+                    </div>
+                `,
+                exercises: [
+                    "Add the studio's new production, <strong>Toy Story 4</strong> to the list of movies (you can use any director)",
+                    "Toy Story 4 has been released! Add the record with rating=<strong>8.7</strong>, domestic_sales=<strong>340000000</strong>, international_sales=<strong>270000000</strong>"
+                ]
+            },
+            14: {
+                title: "SQL Lesson 14: Updating Rows",
+                db: "movies",
+                content: `
+                    <h3>UPDATE Statement</h3>
+                    <p>The <code>UPDATE</code> statement modifies existing data in a table:</p>
+
+                    <div class="syntax-box">UPDATE table_name
+SET column = value_or_expr,
+    other_column = another_value_or_expr,
+    ...
+WHERE condition;</div>
+
+                    <div class="warning-box">
+                        <strong>DANGER!</strong> If you forget the WHERE clause, the UPDATE will apply to <strong>ALL rows</strong> in the table!
+                    </div>
+
+                    <h3>Best Practice</h3>
+                    <p>Before running UPDATE, test your WHERE clause with SELECT:</p>
+                    <div class="syntax-box">-- First, verify you're targeting the right rows:
+SELECT * FROM movies WHERE id = 2;
+
+-- Then update:
+UPDATE movies SET director = "John Lasseter" WHERE id = 2;</div>
+
+                    <h3>Updating Multiple Columns</h3>
+                    <div class="syntax-box">UPDATE movies
+SET title = "Toy Story 3",
+    director = "Lee Unkrich"
+WHERE id = 11;</div>
+                `,
+                exercises: [
+                    "The director for A Bug's Life is incorrect, it was actually directed by <strong>John Lasseter</strong>",
+                    "The year that Toy Story 2 was released is incorrect, it was actually released in <strong>1999</strong>",
+                    "Both the title and director for Toy Story 8 are incorrect! The title should be \"<strong>Toy Story 3</strong>\" and it was directed by <strong>Lee Unkrich</strong>"
+                ]
+            },
+            15: {
+                title: "SQL Lesson 15: Deleting Rows",
+                db: "movies",
+                content: `
+                    <h3>DELETE Statement</h3>
+                    <p>The <code>DELETE</code> statement removes rows from a table:</p>
+
+                    <div class="syntax-box">DELETE FROM table_name
+WHERE condition;</div>
+
+                    <div class="warning-box">
+                        <strong>EXTREME DANGER!</strong> If you omit the WHERE clause, DELETE will remove <strong>ALL rows</strong> from the table! This is irreversible.
+                    </div>
+
+                    <h3>Best Practice</h3>
+                    <p>Always test your WHERE clause with SELECT first:</p>
+                    <div class="syntax-box">-- Verify what will be deleted:
+SELECT * FROM movies WHERE year < 2005;
+
+-- If that looks right, delete:
+DELETE FROM movies WHERE year < 2005;</div>
+
+                    <h3>Common Patterns</h3>
+                    <div class="syntax-box">-- Delete specific row by ID
+DELETE FROM movies WHERE id = 5;
+
+-- Delete multiple matching rows
+DELETE FROM employees WHERE years_employed < 1;
+
+-- Delete all (DANGEROUS!)
+DELETE FROM table_name;</div>
+
+                    <p><strong>Tip:</strong> "Read your DELETE statement twice, execute once!"</p>
+                `,
+                exercises: [
+                    "This database is getting too big, let's remove all movies that were released <strong>before</strong> 2005",
+                    "Andrew Stanton has also left the studio, so please remove all movies directed by him"
+                ]
+            },
+            16: {
+                title: "SQL Lesson 16: Creating Tables",
+                db: "empty",
+                content: `
+                    <h3>CREATE TABLE Statement</h3>
+                    <p>Create a new table with specified columns and data types:</p>
+
+                    <div class="syntax-box">CREATE TABLE IF NOT EXISTS table_name (
+    column1 DataType Constraints,
+    column2 DataType Constraints,
+    ...
+);</div>
+
+                    <p><code>IF NOT EXISTS</code> prevents errors if the table already exists.</p>
+
+                    <h3>Common Data Types</h3>
+                    <table class="operator-table">
+                        <tr><th>Type</th><th>Description</th></tr>
+                        <tr><td><code>INTEGER, INT</code></td><td>Whole numbers</td></tr>
+                        <tr><td><code>REAL, FLOAT, DOUBLE</code></td><td>Decimal numbers</td></tr>
+                        <tr><td><code>TEXT, VARCHAR(n)</code></td><td>Text strings</td></tr>
+                        <tr><td><code>BOOLEAN</code></td><td>True/False (0/1)</td></tr>
+                        <tr><td><code>DATE, DATETIME</code></td><td>Date/time values</td></tr>
+                        <tr><td><code>BLOB</code></td><td>Binary data</td></tr>
+                    </table>
+
+                    <h3>Common Constraints</h3>
+                    <table class="operator-table">
+                        <tr><th>Constraint</th><th>Description</th></tr>
+                        <tr><td><code>PRIMARY KEY</code></td><td>Unique identifier for each row</td></tr>
+                        <tr><td><code>AUTOINCREMENT</code></td><td>Auto-fills with incrementing integers</td></tr>
+                        <tr><td><code>UNIQUE</code></td><td>No duplicate values allowed</td></tr>
+                        <tr><td><code>NOT NULL</code></td><td>Must have a value</td></tr>
+                        <tr><td><code>DEFAULT value</code></td><td>Default value if none provided</td></tr>
+                        <tr><td><code>CHECK (expr)</code></td><td>Custom validation</td></tr>
+                        <tr><td><code>FOREIGN KEY</code></td><td>References another table</td></tr>
+                    </table>
+
+                    <h3>Example</h3>
+                    <div class="syntax-box">CREATE TABLE movies (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    title TEXT NOT NULL,
+    director TEXT,
+    year INTEGER,
+    length_minutes INTEGER DEFAULT 90
+);</div>
+                `,
+                exercises: [
+                    "Create a new table named <strong>Database</strong> with columns: <code>Name</code> (TEXT), <code>Version</code> (REAL), <code>Download_count</code> (INTEGER)"
+                ]
+            },
+            17: {
+                title: "SQL Lesson 17: Altering Tables",
+                db: "movies",
+                content: `
+                    <h3>ALTER TABLE Statement</h3>
+                    <p>Modify an existing table's structure:</p>
+
+                    <h3>Add a Column</h3>
+                    <div class="syntax-box">ALTER TABLE table_name
+ADD column DataType OptionalConstraints;</div>
+
+                    <h3>Remove a Column</h3>
+                    <div class="syntax-box">ALTER TABLE table_name
+DROP column;</div>
+
+                    <h3>Rename a Table</h3>
+                    <div class="syntax-box">ALTER TABLE table_name
+RENAME TO new_table_name;</div>
+
+                    <h3>Examples</h3>
+                    <div class="syntax-box">-- Add an 'aspect_ratio' column
+ALTER TABLE movies ADD aspect_ratio REAL;
+
+-- Add a 'language' column with default
+ALTER TABLE movies ADD language TEXT DEFAULT 'English';
+
+-- Rename the table
+ALTER TABLE movies RENAME TO films;</div>
+
+                    <div class="warning-box">
+                        <strong>Note:</strong> SQLite has limited ALTER TABLE support. You can ADD columns and RENAME tables, but DROP column may not work in older versions.
+                    </div>
+                `,
+                exercises: [
+                    "Add a new column named <strong>Aspect_ratio</strong> with a <code>REAL</code> data type to store the aspect-ratio each movie was released in",
+                    "Add another column named <strong>Language</strong> with a <code>TEXT</code> data type to store the language the movie was released in. Default to <strong>English</strong>."
+                ]
+            },
+            18: {
+                title: "SQL Lesson 18: Dropping Tables",
+                db: "movies",
+                content: `
+                    <h3>DROP TABLE Statement</h3>
+                    <p>Remove an entire table from the database:</p>
+
+                    <div class="syntax-box">DROP TABLE IF EXISTS table_name;</div>
+
+                    <p><code>IF EXISTS</code> prevents errors if the table doesn't exist.</p>
+
+                    <div class="warning-box">
+                        <strong>IRREVERSIBLE!</strong> Dropping a table deletes all its data and structure permanently. Unlike DELETE (which removes rows), DROP removes the table itself.
+                    </div>
+
+                    <h3>When to Use DROP TABLE</h3>
+                    <ul>
+                        <li>Removing temporary tables</li>
+                        <li>Cleaning up during development</li>
+                        <li>Restructuring the database</li>
+                    </ul>
+
+                    <h3>Related Commands</h3>
+                    <div class="syntax-box">-- Delete all rows but keep table structure
+DELETE FROM table_name;
+
+-- Or (faster for large tables):
+TRUNCATE TABLE table_name;  -- Not supported in SQLite
+
+-- Remove table entirely
+DROP TABLE table_name;</div>
+
+                    <h3>Congratulations!</h3>
+                    <p>You've completed all the SQL lessons! You now know how to:</p>
+                    <ul>
+                        <li>Query data with SELECT, WHERE, ORDER BY, LIMIT</li>
+                        <li>Join multiple tables</li>
+                        <li>Use aggregate functions</li>
+                        <li>Insert, update, and delete data</li>
+                        <li>Create, modify, and drop tables</li>
+                    </ul>
+                `,
+                exercises: [
+                    "We've finished with this database, so drop the <strong>Movies</strong> table",
+                    "Also drop the <strong>Boxoffice</strong> table as well"
+                ]
+            }
+        };
+
+        // ============================================
+        // DATABASE SETUP
+        // ============================================
+        let db;
+        let currentLesson = 2;
+        let completedExercises = JSON.parse(localStorage.getItem('completedExercises') || '{}');
+
+        const movieData = [
+            [1, "Toy Story", "John Lasseter", 1995, 81],
+            [2, "A Bug's Life", "John Lasseter", 1998, 95],
+            [3, "Toy Story 2", "John Lasseter", 1999, 93],
+            [4, "Monsters, Inc.", "Pete Docter", 2001, 92],
+            [5, "Finding Nemo", "Andrew Stanton", 2003, 107],
+            [6, "The Incredibles", "Brad Bird", 2004, 116],
+            [7, "Cars", "John Lasseter", 2006, 117],
+            [8, "Ratatouille", "Brad Bird", 2007, 115],
+            [9, "WALL-E", "Andrew Stanton", 2008, 104],
+            [10, "Up", "Pete Docter", 2009, 101],
+            [11, "Toy Story 3", "Lee Unkrich", 2010, 103],
+            [12, "Cars 2", "John Lasseter", 2011, 120],
+            [13, "Brave", "Brenda Chapman", 2012, 102],
+            [14, "Monsters University", "Dan Scanlon", 2013, 110]
+        ];
+
+        const boxofficeData = [
+            [5, 8.2, 380843261, 555900000],
+            [14, 7.4, 268492764, 475066843],
+            [8, 8.0, 206445654, 417277164],
+            [12, 6.4, 191452396, 368400000],
+            [3, 7.9, 245852179, 239163000],
+            [6, 8.0, 261441092, 370001000],
+            [9, 8.5, 223808164, 297503696],
+            [11, 8.3, 415004880, 648167031],
+            [1, 8.3, 191796233, 170162503],
+            [7, 7.2, 244082982, 217900167],
+            [10, 8.3, 293004164, 438338580],
+            [4, 8.1, 289916256, 272900000],
+            [2, 7.2, 162798565, 200600000],
+            [13, 7.2, 237283207, 301700000]
+        ];
+
+        const cityData = [
+            ["Guadalajara", "Mexico", 1500800, 20.659699, -103.349609],
+            ["Toronto", "Canada", 2795060, 43.653226, -79.383184],
+            ["Houston", "United States", 2195914, 29.760427, -95.369803],
+            ["New York", "United States", 8405837, 40.712784, -74.005941],
+            ["Philadelphia", "United States", 1553165, 39.952584, -75.165222],
+            ["Phoenix", "United States", 1513367, 33.448377, -112.074037],
+            ["Los Angeles", "United States", 3884307, 34.052234, -118.243685],
+            ["Ecatepec de Morelos", "Mexico", 1742000, 19.601841, -99.050674],
+            ["Montreal", "Canada", 1717767, 45.501689, -73.567256],
+            ["Chicago", "United States", 2718782, 41.878114, -87.629798]
+        ];
+
+        const employeeData = [
+            [1, "James", "Engineer", "1e", 5],
+            [2, "Diana", "Engineer", "1e", 7],
+            [3, "Marcus", "Artist", "1w", 3],
+            [4, "Sara", "Artist", null, 2],
+            [5, "Roberto", "Manager", "1e", 8],
+            [6, "Sue", "Engineer", "2w", 3],
+            [7, "Yao", "Artist", "2w", 6],
+            [8, "Oliver", "Manager", null, 4]
+        ];
+
+        const buildingData = [
+            ["1e", 24],
+            ["1w", 32],
+            ["2e", 16],
+            ["2w", 20]
+        ];
+
+        function initDB(dbType) {
+            db.run("DROP TABLE IF EXISTS movies");
+            db.run("DROP TABLE IF EXISTS boxoffice");
+            db.run("DROP TABLE IF EXISTS north_american_cities");
+            db.run("DROP TABLE IF EXISTS employees");
+            db.run("DROP TABLE IF EXISTS buildings");
+            db.run("DROP TABLE IF EXISTS Database");
+
+            if (dbType === "movies" || dbType === "movies_boxoffice") {
+                db.run(`CREATE TABLE movies (
+                    id INTEGER PRIMARY KEY,
+                    title TEXT,
+                    director TEXT,
+                    year INTEGER,
+                    length_minutes INTEGER
+                )`);
+                movieData.forEach(row => {
+                    db.run("INSERT INTO movies VALUES (?, ?, ?, ?, ?)", row);
+                });
+            }
+
+            if (dbType === "movies_boxoffice") {
+                db.run(`CREATE TABLE boxoffice (
+                    movie_id INTEGER PRIMARY KEY,
+                    rating REAL,
+                    domestic_sales INTEGER,
+                    international_sales INTEGER
+                )`);
+                boxofficeData.forEach(row => {
+                    db.run("INSERT INTO boxoffice VALUES (?, ?, ?, ?)", row);
+                });
+            }
+
+            if (dbType === "cities") {
+                db.run(`CREATE TABLE north_american_cities (
+                    city TEXT,
+                    country TEXT,
+                    population INTEGER,
+                    latitude REAL,
+                    longitude REAL
+                )`);
+                cityData.forEach(row => {
+                    db.run("INSERT INTO north_american_cities VALUES (?, ?, ?, ?, ?)", row);
+                });
+            }
+
+            if (dbType === "employees") {
+                db.run(`CREATE TABLE employees (
+                    id INTEGER PRIMARY KEY,
+                    name TEXT,
+                    role TEXT,
+                    building TEXT,
+                    years_employed INTEGER
+                )`);
+                employeeData.forEach(row => {
+                    db.run("INSERT INTO employees VALUES (?, ?, ?, ?, ?)", row);
+                });
+
+                db.run(`CREATE TABLE buildings (
+                    building_name TEXT PRIMARY KEY,
+                    capacity INTEGER
+                )`);
+                buildingData.forEach(row => {
+                    db.run("INSERT INTO buildings VALUES (?, ?)", row);
+                });
+            }
+
+            // "empty" db type creates no tables - used for CREATE TABLE exercises
+        }
+
+        // ============================================
+        // UI FUNCTIONS
+        // ============================================
+
+        function renderDataTable(tableName, columns, data) {
+            let html = `<h4>${tableName} Table</h4>`;
+            html += '<div style="overflow-x: auto;"><table class="preview-table">';
+            html += '<thead><tr>' + columns.map(c => `<th>${c}</th>`).join('') + '</tr></thead>';
+            html += '<tbody>';
+            data.forEach(row => {
+                html += '<tr>' + row.map(v => `<td>${v === null ? '<em>NULL</em>' : v}</td>`).join('') + '</tr>';
+            });
+            html += '</tbody></table></div>';
+            return html;
+        }
+
+        function renderDataTables(dbType) {
+            const dataTablesArea = document.getElementById('dataTablesArea');
+            let html = '';
+
+            if (dbType === "movies") {
+                html += renderDataTable('Movies',
+                    ['id', 'title', 'director', 'year', 'length_minutes'],
+                    movieData
+                );
+            } else if (dbType === "movies_boxoffice") {
+                html += renderDataTable('Movies',
+                    ['id', 'title', 'director', 'year', 'length_minutes'],
+                    movieData
+                );
+                html += renderDataTable('Boxoffice',
+                    ['movie_id', 'rating', 'domestic_sales', 'international_sales'],
+                    boxofficeData
+                );
+            } else if (dbType === "cities") {
+                html += renderDataTable('North_american_cities',
+                    ['city', 'country', 'population', 'latitude', 'longitude'],
+                    cityData
+                );
+            } else if (dbType === "employees") {
+                html += renderDataTable('Employees',
+                    ['id', 'name', 'role', 'building', 'years_employed'],
+                    employeeData
+                );
+                html += renderDataTable('Buildings',
+                    ['building_name', 'capacity'],
+                    buildingData
+                );
+            } else if (dbType === "empty") {
+                html = '<p><em>No tables yet - this lesson is about creating tables!</em></p>';
+            }
+
+            dataTablesArea.innerHTML = html;
+        }
+
+        function loadLesson(lessonNum) {
+            currentLesson = lessonNum;
+            const lesson = lessons[lessonNum];
+
+            document.getElementById('lessonTitle').textContent = lesson.title;
+            document.getElementById('lessonContent').innerHTML = lesson.content;
+
+            // Update sidebar active state
+            document.querySelectorAll('.lesson-link').forEach(link => {
+                link.classList.remove('active');
+                if (parseInt(link.dataset.lesson) === lessonNum) {
+                    link.classList.add('active');
+                }
+            });
+
+            // Render exercises
+            const exerciseList = document.getElementById('exerciseList');
+            exerciseList.innerHTML = lesson.exercises.map((ex, i) => {
+                const isCompleted = completedExercises[`${lessonNum}-${i}`];
+                return `<div class="exercise-item ${isCompleted ? 'completed' : ''}">
+                    <span class="exercise-num">${i + 1}.</span> ${ex}
+                </div>`;
+            }).join('');
+
+            // Reset database for this lesson
+            initDB(lesson.db);
+
+            // Render data tables preview
+            renderDataTables(lesson.db);
+
+            // Set default query
+            if (lesson.db === "movies" || lesson.db === "movies_boxoffice") {
+                document.getElementById('sqlEditor').value = "SELECT * FROM movies;";
+            } else if (lesson.db === "cities") {
+                document.getElementById('sqlEditor').value = "SELECT * FROM north_american_cities;";
+            } else if (lesson.db === "employees") {
+                document.getElementById('sqlEditor').value = "SELECT * FROM employees;";
+            } else {
+                document.getElementById('sqlEditor').value = "";
+            }
+
+            // Clear results
+            document.getElementById('resultsArea').innerHTML = '<div class="message info">Run a query to see results</div>';
+
+            // Update completed status in sidebar
+            updateSidebarCompletion();
+        }
+
+        function updateSidebarCompletion() {
+            document.querySelectorAll('.lesson-link').forEach(link => {
+                const lessonNum = parseInt(link.dataset.lesson);
+                const lesson = lessons[lessonNum];
+                const allCompleted = lesson.exercises.every((_, i) => completedExercises[`${lessonNum}-${i}`]);
+                if (allCompleted && lesson.exercises.length > 0) {
+                    link.classList.add('completed');
+                } else {
+                    link.classList.remove('completed');
+                }
+            });
+        }
+
+        function runQuery() {
+            const sql = document.getElementById('sqlEditor').value.trim();
+            const resultsArea = document.getElementById('resultsArea');
+
+            if (!sql) {
+                resultsArea.innerHTML = '<div class="message error">Please enter a SQL query</div>';
+                return;
+            }
+
+            try {
+                const results = db.exec(sql);
+
+                if (results.length === 0) {
+                    // For INSERT/UPDATE/DELETE/CREATE/DROP
+                    const changes = db.getRowsModified();
+                    resultsArea.innerHTML = `<div class="message success">Query executed successfully. ${changes} row(s) affected.</div>`;
+                } else {
+                    // Display results table
+                    const columns = results[0].columns;
+                    const values = results[0].values;
+
+                    let html = '<div class="table-wrapper" style="overflow-x: auto;">';
+                    html += '<table class="results-table">';
+                    html += '<thead><tr>' + columns.map(c => `<th>${c}</th>`).join('') + '</tr></thead>';
+                    html += '<tbody>';
+                    values.forEach(row => {
+                        html += '<tr>' + row.map(v => `<td>${v === null ? '<em>NULL</em>' : v}</td>`).join('') + '</tr>';
+                    });
+                    html += '</tbody></table></div>';
+                    html += `<div class="row-count">${values.length} row(s) returned</div>`;
+
+                    resultsArea.innerHTML = html;
+                }
+            } catch (err) {
+                resultsArea.innerHTML = `<div class="message error"><strong>Error:</strong> ${err.message}</div>`;
+            }
+        }
+
+        function resetDatabase() {
+            const lesson = lessons[currentLesson];
+            initDB(lesson.db);
+            document.getElementById('resultsArea').innerHTML = '<div class="message info">Database reset to original state</div>';
+        }
+
+        // ============================================
+        // INITIALIZATION
+        // ============================================
+        async function init() {
+            try {
+                const SQL = await initSqlJs({
+                    locateFile: file => file
+                });
+                db = new SQL.Database();
+
+                // Set up event listeners
+                document.querySelectorAll('.lesson-link').forEach(link => {
+                    link.addEventListener('click', () => {
+                        loadLesson(parseInt(link.dataset.lesson));
+                    });
+                });
+
+                document.getElementById('runBtn').addEventListener('click', runQuery);
+                document.getElementById('resetBtn').addEventListener('click', resetDatabase);
+
+                // Keyboard shortcut
+                document.getElementById('sqlEditor').addEventListener('keydown', (e) => {
+                    if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+                        e.preventDefault();
+                        runQuery();
+                    }
+                });
+
+                // Load starting lesson
+                loadLesson(2);
+
+            } catch (err) {
+                document.getElementById('lessonContent').innerHTML = `
+                    <div class="message error">
+                        <strong>Error loading SQL engine:</strong> ${err.message}<br><br>
+                        Make sure <code>sql-wasm.js</code> and <code>sql-wasm.wasm</code> are in the same folder as this HTML file.
+                    </div>
+                `;
+            }
+        }
+
+        init();
+    </script>
+</body>
+</html>
