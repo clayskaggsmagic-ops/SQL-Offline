@@ -374,6 +374,29 @@
             border: 1px solid #ccc;
             font-family: inherit;
         }
+        /* Answer toggle for puzzles */
+        .answer-toggle {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 6px 12px;
+            font-size: 12px;
+        }
+        .answer-content {
+            display: none;
+            margin-top: 10px;
+            background: #fffbea;
+            border: 1px solid #f0e6c0;
+            border-left: 4px solid #f5c842;
+            border-radius: 0 5px 5px 0;
+            padding: 12px 15px;
+        }
+        .answer-content pre {
+            margin: 0;
+            font-family: "SF Mono", Monaco, Consolas, monospace;
+            font-size: 13px;
+            white-space: pre-wrap;
+            color: #5a4a00;
+        }
     </style>
 </head>
 <body>
@@ -430,6 +453,22 @@
                 <a class="lesson-link" data-lesson="21">Practice 3: Data Manipulation</a>
                 <a class="lesson-link" data-lesson="22">Practice 4: Complex Queries</a>
                 <a class="lesson-link" data-lesson="23">Practice 5: Final Challenge</a>
+            </div>
+
+            <div class="lesson-group">
+                <div class="lesson-group-title">SQL Puzzles</div>
+                <a class="lesson-link" data-lesson="24">Puzzle 1: Library System</a>
+                <a class="lesson-link" data-lesson="25">Puzzle 2: Restaurant Orders</a>
+                <a class="lesson-link" data-lesson="26">Puzzle 3: Music Streaming</a>
+                <a class="lesson-link" data-lesson="27">Puzzle 4: Flight Bookings</a>
+                <a class="lesson-link" data-lesson="28">Puzzle 5: E-Commerce</a>
+            </div>
+
+            <div class="lesson-group">
+                <div class="lesson-group-title">High Challenge</div>
+                <a class="lesson-link" data-lesson="29">Challenge 1: Hospital Records</a>
+                <a class="lesson-link" data-lesson="30">Challenge 2: Sports League</a>
+                <a class="lesson-link" data-lesson="31">Challenge 3: Stock Trading</a>
             </div>
         </nav>
 
@@ -1246,6 +1285,337 @@ RENAME TO new_table_name;</div>
                     "List all buildings that either have no employees OR have employees with a combined experience of less than 10 years. Show building name and total years (use 0 for empty buildings)",
                     "Write a query that shows for each decade (1990s, 2000s, 2010s) the number of movies released and the average movie length. Hint: Use integer division (year/10*10) to group by decade"
                 ]
+            },
+            // ============================================
+            // SQL PUZZLES (with hidden answers)
+            // ============================================
+            24: {
+                title: "SQL Puzzle 1: Library System",
+                db: "puzzle_library",
+                content: `
+                    <p>Welcome to the SQL Puzzles! These challenging problems use completely new databases unrelated to previous lessons. Each puzzle has a <strong>Show Answer</strong> button if you get stuck.</p>
+
+                    <h3>Scenario</h3>
+                    <p>You're a librarian analyzing the library's database to generate reports and insights about books and borrowing patterns.</p>
+
+                    <h3>Available Tables</h3>
+                    <ul>
+                        <li><strong>books</strong>: id, title, author, genre, published_year, copies_available</li>
+                        <li><strong>borrowers</strong>: id, name, membership_date, books_borrowed</li>
+                    </ul>
+
+                    <div class="warning-box">
+                        <strong>Challenge Mode:</strong> Try to solve each puzzle before revealing the answer!
+                    </div>
+                `,
+                exercises: [
+                    "Find all books by George Orwell, showing title and published year, ordered by year",
+                    "List all borrowers who joined in 2020 or later and have borrowed more than 10 books",
+                    "Find the average number of copies available per genre",
+                    "Which author has the most books in the library? Show author name and book count",
+                    "Find all Dystopian books published before 1950, sorted by title alphabetically"
+                ],
+                answers: [
+                    "SELECT title, published_year\nFROM books\nWHERE author = 'George Orwell'\nORDER BY published_year;",
+                    "SELECT name, membership_date, books_borrowed\nFROM borrowers\nWHERE membership_date >= '2020-01-01'\n  AND books_borrowed > 10;",
+                    "SELECT genre, AVG(copies_available) AS avg_copies\nFROM books\nGROUP BY genre;",
+                    "SELECT author, COUNT(*) AS book_count\nFROM books\nGROUP BY author\nORDER BY book_count DESC\nLIMIT 1;",
+                    "SELECT title, published_year\nFROM books\nWHERE genre = 'Dystopian'\n  AND published_year < 1950\nORDER BY title;"
+                ]
+            },
+            25: {
+                title: "SQL Puzzle 2: Restaurant Orders",
+                db: "puzzle_restaurant",
+                content: `
+                    <h3>Scenario</h3>
+                    <p>You're analyzing data for a restaurant to understand ordering patterns and optimize the menu.</p>
+
+                    <h3>Available Tables</h3>
+                    <ul>
+                        <li><strong>menu_items</strong>: id, name, category, price, is_vegetarian (1=yes, 0=no)</li>
+                        <li><strong>orders</strong>: id, customer_name, item_id, quantity, order_date</li>
+                    </ul>
+
+                    <div class="warning-box">
+                        <strong>Tip:</strong> Remember to JOIN tables when you need data from both menu_items and orders!
+                    </div>
+                `,
+                exercises: [
+                    "List all vegetarian items with their prices, sorted by price descending",
+                    "Find the total revenue generated by each menu item. Show item name and total revenue (price * quantity sold)",
+                    "Which customer spent the most money? Show customer name and total spent",
+                    "Find all items that have never been ordered",
+                    "Calculate the average order value per day"
+                ],
+                answers: [
+                    "SELECT name, price\nFROM menu_items\nWHERE is_vegetarian = 1\nORDER BY price DESC;",
+                    "SELECT m.name, SUM(m.price * o.quantity) AS total_revenue\nFROM menu_items m\nJOIN orders o ON m.id = o.item_id\nGROUP BY m.id, m.name\nORDER BY total_revenue DESC;",
+                    "SELECT o.customer_name, SUM(m.price * o.quantity) AS total_spent\nFROM orders o\nJOIN menu_items m ON o.item_id = m.id\nGROUP BY o.customer_name\nORDER BY total_spent DESC\nLIMIT 1;",
+                    "SELECT m.name\nFROM menu_items m\nLEFT JOIN orders o ON m.id = o.item_id\nWHERE o.id IS NULL;",
+                    "SELECT order_date, \n       ROUND(SUM(m.price * o.quantity) / COUNT(DISTINCT o.id), 2) AS avg_order_value\nFROM orders o\nJOIN menu_items m ON o.item_id = m.id\nGROUP BY order_date;"
+                ]
+            },
+            26: {
+                title: "SQL Puzzle 3: Music Streaming",
+                db: "puzzle_music",
+                content: `
+                    <h3>Scenario</h3>
+                    <p>You work for a music streaming service and need to analyze artist performance and song popularity.</p>
+
+                    <h3>Available Tables</h3>
+                    <ul>
+                        <li><strong>artists</strong>: id, name, genre, country, debut_year</li>
+                        <li><strong>songs</strong>: id, title, artist_id, duration_seconds, streams</li>
+                    </ul>
+
+                    <div class="warning-box">
+                        <strong>Note:</strong> Streams are in raw numbers (e.g., 3200000000 = 3.2 billion)
+                    </div>
+                `,
+                exercises: [
+                    "Find all artists from the UK who debuted after 2000",
+                    "List the top 5 most streamed songs with their artist names",
+                    "Calculate the total streams for each artist. Show artist name and total streams, sorted by streams descending",
+                    "Find the average song duration (in minutes) for each genre",
+                    "Which artist has songs with total streams exceeding 5 billion? Show artist name and total streams"
+                ],
+                answers: [
+                    "SELECT name, genre, debut_year\nFROM artists\nWHERE country = 'UK'\n  AND debut_year > 2000;",
+                    "SELECT s.title, a.name AS artist, s.streams\nFROM songs s\nJOIN artists a ON s.artist_id = a.id\nORDER BY s.streams DESC\nLIMIT 5;",
+                    "SELECT a.name, SUM(s.streams) AS total_streams\nFROM artists a\nJOIN songs s ON a.id = s.artist_id\nGROUP BY a.id, a.name\nORDER BY total_streams DESC;",
+                    "SELECT a.genre, ROUND(AVG(s.duration_seconds) / 60.0, 2) AS avg_minutes\nFROM songs s\nJOIN artists a ON s.artist_id = a.id\nGROUP BY a.genre;",
+                    "SELECT a.name, SUM(s.streams) AS total_streams\nFROM artists a\nJOIN songs s ON a.id = s.artist_id\nGROUP BY a.id, a.name\nHAVING SUM(s.streams) > 5000000000;"
+                ]
+            },
+            27: {
+                title: "SQL Puzzle 4: Flight Bookings",
+                db: "puzzle_flights",
+                content: `
+                    <h3>Scenario</h3>
+                    <p>You're an analyst for an airline company, examining flight routes and passenger booking data.</p>
+
+                    <h3>Available Tables</h3>
+                    <ul>
+                        <li><strong>flights</strong>: id, origin, destination, departure_time, price, seats_available</li>
+                        <li><strong>passengers</strong>: id, name, flight_id, seat_class (Economy/Business/First), booking_date</li>
+                    </ul>
+
+                    <div class="warning-box">
+                        <strong>Hint:</strong> departure_time is stored as text (e.g., '08:00', '14:30')
+                    </div>
+                `,
+                exercises: [
+                    "Find all flights departing from New York with more than 20 seats available",
+                    "List all passengers who booked Business or First class, along with their flight details",
+                    "Find the most popular route (origin to destination) by number of passengers",
+                    "Which flights have fewer than 10 seats remaining? Show route and seats available",
+                    "Calculate the total revenue per seat class across all flights (assume all passengers paid the flight's base price)"
+                ],
+                answers: [
+                    "SELECT id, destination, departure_time, price, seats_available\nFROM flights\nWHERE origin = 'New York'\n  AND seats_available > 20;",
+                    "SELECT p.name, p.seat_class, f.origin, f.destination, f.departure_time\nFROM passengers p\nJOIN flights f ON p.flight_id = f.id\nWHERE p.seat_class IN ('Business', 'First')\nORDER BY p.seat_class, p.name;",
+                    "SELECT f.origin, f.destination, COUNT(p.id) AS passenger_count\nFROM flights f\nJOIN passengers p ON f.id = p.flight_id\nGROUP BY f.origin, f.destination\nORDER BY passenger_count DESC\nLIMIT 1;",
+                    "SELECT origin || ' -> ' || destination AS route, seats_available\nFROM flights\nWHERE seats_available < 10\nORDER BY seats_available;",
+                    "SELECT p.seat_class, SUM(f.price) AS total_revenue\nFROM passengers p\nJOIN flights f ON p.flight_id = f.id\nGROUP BY p.seat_class\nORDER BY total_revenue DESC;"
+                ]
+            },
+            28: {
+                title: "SQL Puzzle 5: E-Commerce",
+                db: "puzzle_ecommerce",
+                content: `
+                    <h3>Scenario</h3>
+                    <p>You're a data analyst for an e-commerce company, tasked with generating insights about products and customers.</p>
+
+                    <h3>Available Tables</h3>
+                    <ul>
+                        <li><strong>products</strong>: id, name, category, price, stock, rating</li>
+                        <li><strong>customers</strong>: id, name, email, join_date, total_spent</li>
+                    </ul>
+
+                    <div class="warning-box">
+                        <strong>Final Challenge:</strong> These are the hardest puzzles. Good luck!
+                    </div>
+                `,
+                exercises: [
+                    "Find all products with a rating of 4.5 or higher, sorted by rating descending",
+                    "Calculate the total inventory value (price * stock) for each category",
+                    "Find customers who have spent more than $2000 and joined in 2022 or later",
+                    "List products that are low in stock (less than 50) but have high ratings (4.0+)",
+                    "Calculate the average customer spending by year of joining (extract year from join_date)"
+                ],
+                answers: [
+                    "SELECT name, category, price, rating\nFROM products\nWHERE rating >= 4.5\nORDER BY rating DESC;",
+                    "SELECT category, SUM(price * stock) AS inventory_value\nFROM products\nGROUP BY category\nORDER BY inventory_value DESC;",
+                    "SELECT name, email, join_date, total_spent\nFROM customers\nWHERE total_spent > 2000\n  AND join_date >= '2022-01-01';",
+                    "SELECT name, stock, rating, price\nFROM products\nWHERE stock < 50\n  AND rating >= 4.0\nORDER BY rating DESC;",
+                    "SELECT SUBSTR(join_date, 1, 4) AS join_year,\n       ROUND(AVG(total_spent), 2) AS avg_spending\nFROM customers\nGROUP BY SUBSTR(join_date, 1, 4)\nORDER BY join_year;"
+                ]
+            },
+            // ============================================
+            // HIGH CHALLENGE PUZZLES (with mini-lessons)
+            // ============================================
+            29: {
+                title: "High Challenge 1: Hospital Records",
+                db: "challenge_hospital",
+                content: `
+                    <h3>New Concept: Subqueries</h3>
+                    <p>A <strong>subquery</strong> is a query nested inside another query. Subqueries let you use the result of one query as input to another.</p>
+
+                    <h4>Subquery in WHERE clause</h4>
+                    <p>Compare values against results of another query:</p>
+                    <div class="syntax-box">SELECT name, salary
+FROM employees
+WHERE salary > (SELECT AVG(salary) FROM employees);</div>
+
+                    <h4>Subquery in SELECT (Scalar Subquery)</h4>
+                    <p>Return a single value as a column:</p>
+                    <div class="syntax-box">SELECT name,
+       salary,
+       (SELECT AVG(salary) FROM employees) AS company_avg
+FROM employees;</div>
+
+                    <h4>Subquery with IN</h4>
+                    <p>Check if a value exists in a set of results:</p>
+                    <div class="syntax-box">SELECT * FROM orders
+WHERE customer_id IN (SELECT id FROM customers WHERE country = 'USA');</div>
+
+                    <h3>Scenario</h3>
+                    <p>You're analyzing hospital data to generate reports on patient stays and doctor workloads.</p>
+
+                    <h3>Available Tables</h3>
+                    <ul>
+                        <li><strong>doctors</strong>: id, name, specialty, hire_date, salary</li>
+                        <li><strong>patients</strong>: id, name, admission_date, discharge_date, diagnosis, doctor_id</li>
+                    </ul>
+
+                    <div class="warning-box">
+                        <strong>Tip:</strong> In SQLite, you can calculate days between dates using: <code>julianday(date2) - julianday(date1)</code>
+                    </div>
+                `,
+                exercises: [
+                    "Find all patients whose hospital stay was longer than the average stay (use julianday to calculate days)",
+                    "List doctors who earn more than the average salary in their specialty",
+                    "Find the doctor(s) who treated the most patients. Show doctor name and patient count",
+                    "For each patient, show their name, diagnosis, doctor name, and how their stay length compares to average (show the difference in days)",
+                    "Find all specialties where the average doctor salary is above $250,000"
+                ],
+                answers: [
+                    "SELECT name, diagnosis,\n       julianday(discharge_date) - julianday(admission_date) AS stay_days\nFROM patients\nWHERE julianday(discharge_date) - julianday(admission_date) > \n      (SELECT AVG(julianday(discharge_date) - julianday(admission_date)) FROM patients);",
+                    "SELECT d1.name, d1.specialty, d1.salary\nFROM doctors d1\nWHERE d1.salary > (\n    SELECT AVG(d2.salary)\n    FROM doctors d2\n    WHERE d2.specialty = d1.specialty\n);",
+                    "SELECT d.name, COUNT(p.id) AS patient_count\nFROM doctors d\nJOIN patients p ON d.id = p.doctor_id\nGROUP BY d.id, d.name\nHAVING COUNT(p.id) = (\n    SELECT MAX(cnt) FROM (\n        SELECT COUNT(*) AS cnt FROM patients GROUP BY doctor_id\n    )\n);",
+                    "SELECT p.name, p.diagnosis, d.name AS doctor,\n       ROUND(julianday(p.discharge_date) - julianday(p.admission_date) - \n       (SELECT AVG(julianday(discharge_date) - julianday(admission_date)) FROM patients), 1) AS days_vs_avg\nFROM patients p\nJOIN doctors d ON p.doctor_id = d.id;",
+                    "SELECT specialty, ROUND(AVG(salary), 0) AS avg_salary\nFROM doctors\nGROUP BY specialty\nHAVING AVG(salary) > 250000;"
+                ]
+            },
+            30: {
+                title: "High Challenge 2: Sports League",
+                db: "challenge_sports",
+                content: `
+                    <h3>New Concept: Self-Joins</h3>
+                    <p>A <strong>self-join</strong> joins a table to itself. This is useful when you need to compare rows within the same table.</p>
+
+                    <div class="syntax-box">SELECT a.name AS employee, b.name AS manager
+FROM employees a
+JOIN employees b ON a.manager_id = b.id;</div>
+
+                    <h3>New Concept: CASE Statements</h3>
+                    <p>The <strong>CASE</strong> statement lets you add conditional logic to your queries:</p>
+
+                    <div class="syntax-box">SELECT name,
+       salary,
+       CASE
+           WHEN salary > 100000 THEN 'High'
+           WHEN salary > 50000 THEN 'Medium'
+           ELSE 'Low'
+       END AS salary_tier
+FROM employees;</div>
+
+                    <h4>CASE in Aggregations</h4>
+                    <p>You can use CASE inside aggregate functions for conditional counting:</p>
+                    <div class="syntax-box">SELECT
+    COUNT(CASE WHEN status = 'Active' THEN 1 END) AS active_count,
+    COUNT(CASE WHEN status = 'Inactive' THEN 1 END) AS inactive_count
+FROM users;</div>
+
+                    <h3>Scenario</h3>
+                    <p>You're a sports analyst examining player performance and team statistics.</p>
+
+                    <h3>Available Tables</h3>
+                    <ul>
+                        <li><strong>teams</strong>: id, name, city, founded_year, championships</li>
+                        <li><strong>players</strong>: id, name, team_id, position, salary, games_played, points_scored</li>
+                    </ul>
+                `,
+                exercises: [
+                    "Classify each player's salary as 'Superstar' (>$30M), 'Star' (>$15M), 'Starter' (>$8M), or 'Bench' using CASE",
+                    "Find players who score more points per game than the average of their own team",
+                    "For each team, count the number of players in each salary tier (using the tiers from exercise 1)",
+                    "Find pairs of players on the same team where one earns at least 3x more than the other (self-join)",
+                    "Rank teams by their total points scored, and show if they are 'Contender' (>5000 pts), 'Competitive' (>4000), or 'Rebuilding'"
+                ],
+                answers: [
+                    "SELECT name, salary,\n       CASE\n           WHEN salary > 30000000 THEN 'Superstar'\n           WHEN salary > 15000000 THEN 'Star'\n           WHEN salary > 8000000 THEN 'Starter'\n           ELSE 'Bench'\n       END AS salary_tier\nFROM players\nORDER BY salary DESC;",
+                    "SELECT p1.name, p1.team_id, \n       ROUND(p1.points_scored * 1.0 / p1.games_played, 2) AS ppg,\n       t.name AS team\nFROM players p1\nJOIN teams t ON p1.team_id = t.id\nWHERE p1.points_scored * 1.0 / p1.games_played > (\n    SELECT AVG(p2.points_scored * 1.0 / p2.games_played)\n    FROM players p2\n    WHERE p2.team_id = p1.team_id\n);",
+                    "SELECT t.name AS team,\n       COUNT(CASE WHEN p.salary > 30000000 THEN 1 END) AS superstars,\n       COUNT(CASE WHEN p.salary > 15000000 AND p.salary <= 30000000 THEN 1 END) AS stars,\n       COUNT(CASE WHEN p.salary > 8000000 AND p.salary <= 15000000 THEN 1 END) AS starters,\n       COUNT(CASE WHEN p.salary <= 8000000 THEN 1 END) AS bench\nFROM teams t\nJOIN players p ON t.id = p.team_id\nGROUP BY t.id, t.name;",
+                    "SELECT p1.name AS higher_paid, p1.salary AS salary1,\n       p2.name AS lower_paid, p2.salary AS salary2,\n       t.name AS team\nFROM players p1\nJOIN players p2 ON p1.team_id = p2.team_id AND p1.id != p2.id\nJOIN teams t ON p1.team_id = t.id\nWHERE p1.salary >= p2.salary * 3\nORDER BY p1.salary DESC;",
+                    "SELECT t.name, t.city, SUM(p.points_scored) AS total_points,\n       CASE\n           WHEN SUM(p.points_scored) > 5000 THEN 'Contender'\n           WHEN SUM(p.points_scored) > 4000 THEN 'Competitive'\n           ELSE 'Rebuilding'\n       END AS status\nFROM teams t\nJOIN players p ON t.id = p.team_id\nGROUP BY t.id, t.name, t.city\nORDER BY total_points DESC;"
+                ]
+            },
+            31: {
+                title: "High Challenge 3: Stock Trading",
+                db: "challenge_stocks",
+                content: `
+                    <h3>New Concept: Correlated Subqueries</h3>
+                    <p>A <strong>correlated subquery</strong> references columns from the outer query. It runs once for each row in the outer query.</p>
+
+                    <div class="syntax-box">SELECT name, salary
+FROM employees e1
+WHERE salary > (
+    SELECT AVG(salary)
+    FROM employees e2
+    WHERE e2.department = e1.department  -- References outer query!
+);</div>
+
+                    <h3>New Concept: EXISTS / NOT EXISTS</h3>
+                    <p><strong>EXISTS</strong> returns true if the subquery returns any rows:</p>
+
+                    <div class="syntax-box">SELECT name FROM customers c
+WHERE EXISTS (
+    SELECT 1 FROM orders o
+    WHERE o.customer_id = c.id
+    AND o.total > 1000
+);</div>
+
+                    <p><strong>NOT EXISTS</strong> returns true if the subquery returns NO rows:</p>
+                    <div class="syntax-box">SELECT name FROM products p
+WHERE NOT EXISTS (
+    SELECT 1 FROM order_items oi
+    WHERE oi.product_id = p.id
+);  -- Products never ordered</div>
+
+                    <h3>Scenario</h3>
+                    <p>You're analyzing trading patterns and profitability for a brokerage firm.</p>
+
+                    <h3>Available Tables</h3>
+                    <ul>
+                        <li><strong>stocks</strong>: id, symbol, company_name, sector, current_price</li>
+                        <li><strong>trades</strong>: id, stock_id, trade_type (BUY/SELL), quantity, price_per_share, trade_date, trader_name</li>
+                    </ul>
+                `,
+                exercises: [
+                    "Find traders who have made both BUY and SELL trades on the same stock (use EXISTS)",
+                    "Calculate each trader's total investment (sum of BUY trades) and total returns (sum of SELL trades)",
+                    "Find stocks where the current_price is higher than any trade price for that stock",
+                    "For each stock, find the trader who bought the most shares total",
+                    "Find same-day trades where a trader bought and sold the same stock (potential day trading) - show trader, stock, and profit/loss"
+                ],
+                answers: [
+                    "SELECT DISTINCT t1.trader_name, s.symbol\nFROM trades t1\nJOIN stocks s ON t1.stock_id = s.id\nWHERE t1.trade_type = 'BUY'\nAND EXISTS (\n    SELECT 1 FROM trades t2\n    WHERE t2.trader_name = t1.trader_name\n    AND t2.stock_id = t1.stock_id\n    AND t2.trade_type = 'SELL'\n);",
+                    "SELECT trader_name,\n       SUM(CASE WHEN trade_type = 'BUY' THEN quantity * price_per_share ELSE 0 END) AS total_invested,\n       SUM(CASE WHEN trade_type = 'SELL' THEN quantity * price_per_share ELSE 0 END) AS total_returns\nFROM trades\nGROUP BY trader_name;",
+                    "SELECT s.symbol, s.company_name, s.current_price,\n       MAX(t.price_per_share) AS highest_trade_price\nFROM stocks s\nJOIN trades t ON s.id = t.stock_id\nGROUP BY s.id, s.symbol, s.company_name, s.current_price\nHAVING s.current_price > MAX(t.price_per_share);",
+                    "SELECT s.symbol, t.trader_name, SUM(t.quantity) AS shares_bought\nFROM trades t\nJOIN stocks s ON t.stock_id = s.id\nWHERE t.trade_type = 'BUY'\nGROUP BY s.id, s.symbol, t.trader_name\nHAVING SUM(t.quantity) = (\n    SELECT MAX(total_qty) FROM (\n        SELECT SUM(quantity) AS total_qty\n        FROM trades t2\n        WHERE t2.stock_id = t.stock_id AND t2.trade_type = 'BUY'\n        GROUP BY trader_name\n    )\n);",
+                    "SELECT b.trader_name, s.symbol, b.trade_date,\n       b.quantity AS bought_qty, b.price_per_share AS buy_price,\n       se.quantity AS sold_qty, se.price_per_share AS sell_price,\n       (se.price_per_share - b.price_per_share) * \n       CASE WHEN b.quantity < se.quantity THEN b.quantity ELSE se.quantity END AS profit_loss\nFROM trades b\nJOIN trades se ON b.stock_id = se.stock_id \n              AND b.trader_name = se.trader_name \n              AND b.trade_date = se.trade_date\nJOIN stocks s ON b.stock_id = s.id\nWHERE b.trade_type = 'BUY' AND se.trade_type = 'SELL';"
+                ]
             }
         };
 
@@ -1321,6 +1691,219 @@ RENAME TO new_table_name;</div>
             ["2w", 20]
         ];
 
+        // ============================================
+        // PUZZLE DATA
+        // ============================================
+
+        // Puzzle 1: Library System
+        const booksData = [
+            [1, "The Great Gatsby", "F. Scott Fitzgerald", "Fiction", 1925, 3],
+            [2, "To Kill a Mockingbird", "Harper Lee", "Fiction", 1960, 5],
+            [3, "1984", "George Orwell", "Dystopian", 1949, 2],
+            [4, "Pride and Prejudice", "Jane Austen", "Romance", 1813, 4],
+            [5, "The Catcher in the Rye", "J.D. Salinger", "Fiction", 1951, 1],
+            [6, "Brave New World", "Aldous Huxley", "Dystopian", 1932, 3],
+            [7, "Animal Farm", "George Orwell", "Satire", 1945, 6],
+            [8, "The Hobbit", "J.R.R. Tolkien", "Fantasy", 1937, 4],
+            [9, "Fahrenheit 451", "Ray Bradbury", "Dystopian", 1953, 2],
+            [10, "Jane Eyre", "Charlotte Bronte", "Romance", 1847, 3]
+        ];
+        const borrowersData = [
+            [1, "Alice Johnson", "2020-03-15", 12],
+            [2, "Bob Smith", "2019-07-22", 8],
+            [3, "Carol White", "2021-01-10", 24],
+            [4, "David Brown", "2018-11-30", 5],
+            [5, "Emma Davis", "2022-06-05", 15],
+            [6, "Frank Miller", "2020-09-18", 3],
+            [7, "Grace Lee", "2021-08-25", 19],
+            [8, "Henry Wilson", "2019-04-12", 0]
+        ];
+
+        // Puzzle 2: Restaurant Orders
+        const menuItemsData = [
+            [1, "Caesar Salad", "Appetizer", 8.99, 1],
+            [2, "Tomato Soup", "Appetizer", 6.50, 1],
+            [3, "Grilled Salmon", "Main", 24.99, 0],
+            [4, "Ribeye Steak", "Main", 32.99, 0],
+            [5, "Mushroom Risotto", "Main", 18.50, 1],
+            [6, "Chicken Parmesan", "Main", 19.99, 0],
+            [7, "Chocolate Cake", "Dessert", 8.99, 1],
+            [8, "Cheesecake", "Dessert", 7.99, 1],
+            [9, "Ice Cream Sundae", "Dessert", 6.50, 1],
+            [10, "Garlic Bread", "Appetizer", 4.99, 1]
+        ];
+        const ordersData = [
+            [1, "John Doe", 4, 1, "2024-01-15"],
+            [2, "John Doe", 7, 1, "2024-01-15"],
+            [3, "Jane Smith", 1, 2, "2024-01-15"],
+            [4, "Jane Smith", 5, 1, "2024-01-15"],
+            [5, "Mike Johnson", 3, 1, "2024-01-16"],
+            [6, "Mike Johnson", 8, 2, "2024-01-16"],
+            [7, "Sarah Williams", 2, 1, "2024-01-16"],
+            [8, "Sarah Williams", 6, 1, "2024-01-16"],
+            [9, "Sarah Williams", 9, 1, "2024-01-16"],
+            [10, "Tom Brown", 4, 2, "2024-01-17"],
+            [11, "Tom Brown", 10, 3, "2024-01-17"],
+            [12, "Emily Davis", 5, 1, "2024-01-17"],
+            [13, "Emily Davis", 7, 1, "2024-01-17"]
+        ];
+
+        // Puzzle 3: Music Streaming
+        const artistsData = [
+            [1, "The Beatles", "Rock", "UK", 1960],
+            [2, "Taylor Swift", "Pop", "USA", 2006],
+            [3, "Drake", "Hip-Hop", "Canada", 2006],
+            [4, "Adele", "Soul", "UK", 2008],
+            [5, "Ed Sheeran", "Pop", "UK", 2011],
+            [6, "BTS", "K-Pop", "South Korea", 2013],
+            [7, "Beyonce", "R&B", "USA", 1997],
+            [8, "Coldplay", "Rock", "UK", 1996]
+        ];
+        const songsData = [
+            [1, "Hey Jude", 1, 431, 850000000],
+            [2, "Let It Be", 1, 243, 720000000],
+            [3, "Anti-Hero", 2, 200, 1200000000],
+            [4, "Shake It Off", 2, 219, 980000000],
+            [5, "God's Plan", 3, 198, 1500000000],
+            [6, "Hotline Bling", 3, 267, 1100000000],
+            [7, "Hello", 4, 295, 2900000000],
+            [8, "Rolling in the Deep", 4, 228, 1400000000],
+            [9, "Shape of You", 5, 234, 3200000000],
+            [10, "Perfect", 5, 263, 2100000000],
+            [11, "Dynamite", 6, 199, 1600000000],
+            [12, "Butter", 6, 164, 1100000000],
+            [13, "Halo", 7, 261, 890000000],
+            [14, "Yellow", 8, 269, 950000000],
+            [15, "Fix You", 8, 295, 1200000000]
+        ];
+
+        // Puzzle 4: Flight Bookings
+        const flightsData = [
+            [1, "New York", "Los Angeles", "08:00", 299, 45],
+            [2, "New York", "Los Angeles", "14:30", 349, 12],
+            [3, "Los Angeles", "New York", "06:00", 279, 67],
+            [4, "Chicago", "Miami", "10:15", 199, 23],
+            [5, "Miami", "Chicago", "16:45", 189, 89],
+            [6, "Seattle", "Denver", "07:30", 159, 34],
+            [7, "Denver", "Seattle", "19:00", 169, 5],
+            [8, "Boston", "San Francisco", "11:00", 389, 18],
+            [9, "San Francisco", "Boston", "22:00", 359, 42],
+            [10, "Dallas", "Atlanta", "09:45", 129, 56]
+        ];
+        const passengersData = [
+            [1, "Alice Cooper", 1, "Business", "2024-02-01"],
+            [2, "Bob Dylan", 1, "Economy", "2024-02-01"],
+            [3, "Charlie Parker", 2, "First", "2024-02-03"],
+            [4, "Diana Ross", 3, "Business", "2024-02-05"],
+            [5, "Elvis Presley", 4, "Economy", "2024-02-05"],
+            [6, "Freddie Mercury", 4, "Economy", "2024-02-06"],
+            [7, "Gloria Estefan", 5, "Business", "2024-02-07"],
+            [8, "Harry Styles", 6, "Economy", "2024-02-08"],
+            [9, "Iggy Pop", 7, "First", "2024-02-08"],
+            [10, "Janet Jackson", 8, "Business", "2024-02-10"],
+            [11, "Keith Richards", 9, "Economy", "2024-02-10"],
+            [12, "Lady Gaga", 10, "First", "2024-02-12"]
+        ];
+
+        // Puzzle 5: E-Commerce
+        const productsData = [
+            [1, "Laptop Pro 15", "Electronics", 1299.99, 45, 4.5],
+            [2, "Wireless Mouse", "Electronics", 29.99, 234, 4.2],
+            [3, "USB-C Hub", "Electronics", 49.99, 89, 4.0],
+            [4, "Standing Desk", "Furniture", 499.99, 23, 4.7],
+            [5, "Office Chair", "Furniture", 299.99, 67, 4.3],
+            [6, "Desk Lamp", "Furniture", 39.99, 156, 3.9],
+            [7, "Python Cookbook", "Books", 45.99, 78, 4.8],
+            [8, "SQL Mastery", "Books", 39.99, 112, 4.6],
+            [9, "Running Shoes", "Sports", 89.99, 45, 4.4],
+            [10, "Yoga Mat", "Sports", 24.99, 189, 4.1]
+        ];
+        const customersData = [
+            [1, "Alex Turner", "alex@email.com", "2022-01-15", 2456.78],
+            [2, "Betty White", "betty@email.com", "2021-06-20", 567.89],
+            [3, "Chris Martin", "chris@email.com", "2023-03-10", 3421.50],
+            [4, "Dana Scully", "dana@email.com", "2020-11-05", 189.99],
+            [5, "Eric Clapton", "eric@email.com", "2022-08-22", 1876.43],
+            [6, "Fiona Apple", "fiona@email.com", "2023-07-30", 4532.10],
+            [7, "George Lucas", "george@email.com", "2021-02-14", 987.65],
+            [8, "Helen Mirren", "helen@email.com", "2023-12-01", 234.56]
+        ];
+
+        // ============================================
+        // HIGH CHALLENGE DATA
+        // ============================================
+
+        // Challenge 1: Hospital Records
+        const doctorsData = [
+            [1, "Dr. Sarah Chen", "Cardiology", "2015-03-20", 285000],
+            [2, "Dr. James Wilson", "Neurology", "2012-07-15", 310000],
+            [3, "Dr. Maria Garcia", "Pediatrics", "2018-01-10", 195000],
+            [4, "Dr. Robert Kim", "Orthopedics", "2010-11-05", 340000],
+            [5, "Dr. Emily Brown", "Cardiology", "2019-06-22", 245000],
+            [6, "Dr. Michael Lee", "Emergency", "2014-09-30", 275000]
+        ];
+        const patientsData = [
+            [1, "John Smith", "2024-01-05", "2024-01-12", "Heart Arrhythmia", 1],
+            [2, "Alice Johnson", "2024-01-08", "2024-01-10", "Concussion", 2],
+            [3, "Bob Williams", "2024-01-10", "2024-01-25", "Hip Replacement", 4],
+            [4, "Carol Davis", "2024-01-12", "2024-01-14", "Flu", 3],
+            [5, "David Miller", "2024-01-15", "2024-01-18", "Chest Pain", 1],
+            [6, "Eva Martinez", "2024-01-16", "2024-01-17", "Broken Arm", 4],
+            [7, "Frank Taylor", "2024-01-18", "2024-02-01", "Stroke Recovery", 2],
+            [8, "Grace Lee", "2024-01-20", "2024-01-22", "Appendicitis", 6],
+            [9, "Henry Wilson", "2024-01-22", "2024-01-30", "Knee Surgery", 4],
+            [10, "Ivy Chen", "2024-01-25", "2024-01-27", "Pneumonia", 3]
+        ];
+
+        // Challenge 2: Sports League
+        const teamsData = [
+            [1, "Thunder", "Oklahoma City", 2008, 0],
+            [2, "Lakers", "Los Angeles", 1947, 17],
+            [3, "Celtics", "Boston", 1946, 18],
+            [4, "Warriors", "San Francisco", 1946, 7],
+            [5, "Heat", "Miami", 1988, 3]
+        ];
+        const playersData = [
+            [1, "Marcus Johnson", 1, "Guard", 8500000, 72, 1850],
+            [2, "Kevin Adams", 1, "Forward", 12000000, 68, 1420],
+            [3, "Tyler Smith", 2, "Guard", 35000000, 65, 2100],
+            [4, "Andre Williams", 2, "Center", 18000000, 70, 980],
+            [5, "James Brown", 3, "Forward", 28000000, 75, 1920],
+            [6, "Chris Davis", 3, "Guard", 22000000, 71, 1650],
+            [7, "Stephen Lee", 4, "Guard", 45000000, 62, 2450],
+            [8, "Draymond Taylor", 4, "Forward", 20000000, 74, 720],
+            [9, "Jimmy Clark", 5, "Forward", 32000000, 69, 1780],
+            [10, "Bam Rodriguez", 5, "Center", 25000000, 73, 1100],
+            [11, "Paul Wilson", 1, "Center", 6000000, 55, 650],
+            [12, "Ray Allen Jr", 3, "Guard", 15000000, 60, 890]
+        ];
+
+        // Challenge 3: Stock Trading
+        const stocksData = [
+            [1, "AAPL", "Apple Inc", "Technology", 178.50],
+            [2, "GOOGL", "Alphabet Inc", "Technology", 141.25],
+            [3, "MSFT", "Microsoft Corp", "Technology", 378.90],
+            [4, "AMZN", "Amazon.com Inc", "Consumer", 178.75],
+            [5, "JPM", "JPMorgan Chase", "Finance", 195.40],
+            [6, "WMT", "Walmart Inc", "Consumer", 162.30]
+        ];
+        const tradesData = [
+            [1, 1, "BUY", 100, 165.00, "2024-01-10", "Alice"],
+            [2, 1, "BUY", 50, 170.25, "2024-01-15", "Bob"],
+            [3, 1, "SELL", 75, 175.50, "2024-01-20", "Alice"],
+            [4, 2, "BUY", 200, 138.00, "2024-01-12", "Carol"],
+            [5, 2, "SELL", 100, 142.75, "2024-01-18", "Carol"],
+            [6, 3, "BUY", 30, 365.00, "2024-01-08", "David"],
+            [7, 3, "BUY", 20, 372.50, "2024-01-14", "Alice"],
+            [8, 3, "SELL", 30, 380.00, "2024-01-22", "David"],
+            [9, 4, "BUY", 150, 168.25, "2024-01-11", "Bob"],
+            [10, 4, "SELL", 150, 172.50, "2024-01-11", "Bob"],
+            [11, 5, "BUY", 80, 188.00, "2024-01-09", "Carol"],
+            [12, 5, "BUY", 60, 192.25, "2024-01-16", "David"],
+            [13, 6, "BUY", 100, 158.75, "2024-01-13", "Alice"],
+            [14, 6, "SELL", 50, 165.00, "2024-01-19", "Alice"]
+        ];
+
         function initDB(dbType) {
             db.run("DROP TABLE IF EXISTS movies");
             db.run("DROP TABLE IF EXISTS boxoffice");
@@ -1385,6 +1968,207 @@ RENAME TO new_table_name;</div>
                 )`);
                 buildingData.forEach(row => {
                     db.run("INSERT INTO buildings VALUES (?, ?)", row);
+                });
+            }
+
+            // Puzzle databases
+            if (dbType === "puzzle_library") {
+                db.run(`CREATE TABLE books (
+                    id INTEGER PRIMARY KEY,
+                    title TEXT,
+                    author TEXT,
+                    genre TEXT,
+                    published_year INTEGER,
+                    copies_available INTEGER
+                )`);
+                booksData.forEach(row => {
+                    db.run("INSERT INTO books VALUES (?, ?, ?, ?, ?, ?)", row);
+                });
+
+                db.run(`CREATE TABLE borrowers (
+                    id INTEGER PRIMARY KEY,
+                    name TEXT,
+                    membership_date TEXT,
+                    books_borrowed INTEGER
+                )`);
+                borrowersData.forEach(row => {
+                    db.run("INSERT INTO borrowers VALUES (?, ?, ?, ?)", row);
+                });
+            }
+
+            if (dbType === "puzzle_restaurant") {
+                db.run(`CREATE TABLE menu_items (
+                    id INTEGER PRIMARY KEY,
+                    name TEXT,
+                    category TEXT,
+                    price REAL,
+                    is_vegetarian INTEGER
+                )`);
+                menuItemsData.forEach(row => {
+                    db.run("INSERT INTO menu_items VALUES (?, ?, ?, ?, ?)", row);
+                });
+
+                db.run(`CREATE TABLE orders (
+                    id INTEGER PRIMARY KEY,
+                    customer_name TEXT,
+                    item_id INTEGER,
+                    quantity INTEGER,
+                    order_date TEXT
+                )`);
+                ordersData.forEach(row => {
+                    db.run("INSERT INTO orders VALUES (?, ?, ?, ?, ?)", row);
+                });
+            }
+
+            if (dbType === "puzzle_music") {
+                db.run(`CREATE TABLE artists (
+                    id INTEGER PRIMARY KEY,
+                    name TEXT,
+                    genre TEXT,
+                    country TEXT,
+                    debut_year INTEGER
+                )`);
+                artistsData.forEach(row => {
+                    db.run("INSERT INTO artists VALUES (?, ?, ?, ?, ?)", row);
+                });
+
+                db.run(`CREATE TABLE songs (
+                    id INTEGER PRIMARY KEY,
+                    title TEXT,
+                    artist_id INTEGER,
+                    duration_seconds INTEGER,
+                    streams INTEGER
+                )`);
+                songsData.forEach(row => {
+                    db.run("INSERT INTO songs VALUES (?, ?, ?, ?, ?)", row);
+                });
+            }
+
+            if (dbType === "puzzle_flights") {
+                db.run(`CREATE TABLE flights (
+                    id INTEGER PRIMARY KEY,
+                    origin TEXT,
+                    destination TEXT,
+                    departure_time TEXT,
+                    price INTEGER,
+                    seats_available INTEGER
+                )`);
+                flightsData.forEach(row => {
+                    db.run("INSERT INTO flights VALUES (?, ?, ?, ?, ?, ?)", row);
+                });
+
+                db.run(`CREATE TABLE passengers (
+                    id INTEGER PRIMARY KEY,
+                    name TEXT,
+                    flight_id INTEGER,
+                    seat_class TEXT,
+                    booking_date TEXT
+                )`);
+                passengersData.forEach(row => {
+                    db.run("INSERT INTO passengers VALUES (?, ?, ?, ?, ?)", row);
+                });
+            }
+
+            if (dbType === "puzzle_ecommerce") {
+                db.run(`CREATE TABLE products (
+                    id INTEGER PRIMARY KEY,
+                    name TEXT,
+                    category TEXT,
+                    price REAL,
+                    stock INTEGER,
+                    rating REAL
+                )`);
+                productsData.forEach(row => {
+                    db.run("INSERT INTO products VALUES (?, ?, ?, ?, ?, ?)", row);
+                });
+
+                db.run(`CREATE TABLE customers (
+                    id INTEGER PRIMARY KEY,
+                    name TEXT,
+                    email TEXT,
+                    join_date TEXT,
+                    total_spent REAL
+                )`);
+                customersData.forEach(row => {
+                    db.run("INSERT INTO customers VALUES (?, ?, ?, ?, ?)", row);
+                });
+            }
+
+            // High Challenge databases
+            if (dbType === "challenge_hospital") {
+                db.run(`CREATE TABLE doctors (
+                    id INTEGER PRIMARY KEY,
+                    name TEXT,
+                    specialty TEXT,
+                    hire_date TEXT,
+                    salary INTEGER
+                )`);
+                doctorsData.forEach(row => {
+                    db.run("INSERT INTO doctors VALUES (?, ?, ?, ?, ?)", row);
+                });
+
+                db.run(`CREATE TABLE patients (
+                    id INTEGER PRIMARY KEY,
+                    name TEXT,
+                    admission_date TEXT,
+                    discharge_date TEXT,
+                    diagnosis TEXT,
+                    doctor_id INTEGER
+                )`);
+                patientsData.forEach(row => {
+                    db.run("INSERT INTO patients VALUES (?, ?, ?, ?, ?, ?)", row);
+                });
+            }
+
+            if (dbType === "challenge_sports") {
+                db.run(`CREATE TABLE teams (
+                    id INTEGER PRIMARY KEY,
+                    name TEXT,
+                    city TEXT,
+                    founded_year INTEGER,
+                    championships INTEGER
+                )`);
+                teamsData.forEach(row => {
+                    db.run("INSERT INTO teams VALUES (?, ?, ?, ?, ?)", row);
+                });
+
+                db.run(`CREATE TABLE players (
+                    id INTEGER PRIMARY KEY,
+                    name TEXT,
+                    team_id INTEGER,
+                    position TEXT,
+                    salary INTEGER,
+                    games_played INTEGER,
+                    points_scored INTEGER
+                )`);
+                playersData.forEach(row => {
+                    db.run("INSERT INTO players VALUES (?, ?, ?, ?, ?, ?, ?)", row);
+                });
+            }
+
+            if (dbType === "challenge_stocks") {
+                db.run(`CREATE TABLE stocks (
+                    id INTEGER PRIMARY KEY,
+                    symbol TEXT,
+                    company_name TEXT,
+                    sector TEXT,
+                    current_price REAL
+                )`);
+                stocksData.forEach(row => {
+                    db.run("INSERT INTO stocks VALUES (?, ?, ?, ?, ?)", row);
+                });
+
+                db.run(`CREATE TABLE trades (
+                    id INTEGER PRIMARY KEY,
+                    stock_id INTEGER,
+                    trade_type TEXT,
+                    quantity INTEGER,
+                    price_per_share REAL,
+                    trade_date TEXT,
+                    trader_name TEXT
+                )`);
+                tradesData.forEach(row => {
+                    db.run("INSERT INTO trades VALUES (?, ?, ?, ?, ?, ?, ?)", row);
                 });
             }
 
@@ -1462,6 +2246,78 @@ RENAME TO new_table_name;</div>
                     ['city', 'country', 'population', 'latitude', 'longitude'],
                     cityData
                 );
+            } else if (dbType === "puzzle_library") {
+                html += renderDataTable('Books',
+                    ['id', 'title', 'author', 'genre', 'published_year', 'copies_available'],
+                    booksData
+                );
+                html += renderDataTable('Borrowers',
+                    ['id', 'name', 'membership_date', 'books_borrowed'],
+                    borrowersData
+                );
+            } else if (dbType === "puzzle_restaurant") {
+                html += renderDataTable('Menu_items',
+                    ['id', 'name', 'category', 'price', 'is_vegetarian'],
+                    menuItemsData
+                );
+                html += renderDataTable('Orders',
+                    ['id', 'customer_name', 'item_id', 'quantity', 'order_date'],
+                    ordersData
+                );
+            } else if (dbType === "puzzle_music") {
+                html += renderDataTable('Artists',
+                    ['id', 'name', 'genre', 'country', 'debut_year'],
+                    artistsData
+                );
+                html += renderDataTable('Songs',
+                    ['id', 'title', 'artist_id', 'duration_seconds', 'streams'],
+                    songsData
+                );
+            } else if (dbType === "puzzle_flights") {
+                html += renderDataTable('Flights',
+                    ['id', 'origin', 'destination', 'departure_time', 'price', 'seats_available'],
+                    flightsData
+                );
+                html += renderDataTable('Passengers',
+                    ['id', 'name', 'flight_id', 'seat_class', 'booking_date'],
+                    passengersData
+                );
+            } else if (dbType === "puzzle_ecommerce") {
+                html += renderDataTable('Products',
+                    ['id', 'name', 'category', 'price', 'stock', 'rating'],
+                    productsData
+                );
+                html += renderDataTable('Customers',
+                    ['id', 'name', 'email', 'join_date', 'total_spent'],
+                    customersData
+                );
+            } else if (dbType === "challenge_hospital") {
+                html += renderDataTable('Doctors',
+                    ['id', 'name', 'specialty', 'hire_date', 'salary'],
+                    doctorsData
+                );
+                html += renderDataTable('Patients',
+                    ['id', 'name', 'admission_date', 'discharge_date', 'diagnosis', 'doctor_id'],
+                    patientsData
+                );
+            } else if (dbType === "challenge_sports") {
+                html += renderDataTable('Teams',
+                    ['id', 'name', 'city', 'founded_year', 'championships'],
+                    teamsData
+                );
+                html += renderDataTable('Players',
+                    ['id', 'name', 'team_id', 'position', 'salary', 'games_played', 'points_scored'],
+                    playersData
+                );
+            } else if (dbType === "challenge_stocks") {
+                html += renderDataTable('Stocks',
+                    ['id', 'symbol', 'company_name', 'sector', 'current_price'],
+                    stocksData
+                );
+                html += renderDataTable('Trades',
+                    ['id', 'stock_id', 'trade_type', 'quantity', 'price_per_share', 'trade_date', 'trader_name'],
+                    tradesData
+                );
             }
 
             dataTablesArea.innerHTML = html;
@@ -1486,8 +2342,15 @@ RENAME TO new_table_name;</div>
             const exerciseList = document.getElementById('exerciseList');
             exerciseList.innerHTML = lesson.exercises.map((ex, i) => {
                 const isCompleted = completedExercises[`${lessonNum}-${i}`];
+                const hasAnswer = lesson.answers && lesson.answers[i];
                 return `<div class="exercise-item ${isCompleted ? 'completed' : ''}">
                     <span class="exercise-num">${i + 1}.</span> ${ex}
+                    ${hasAnswer ? `
+                        <button class="btn btn-secondary answer-toggle" onclick="toggleAnswer(${lessonNum}, ${i})">Show Answer</button>
+                        <div class="answer-content" id="answer-${lessonNum}-${i}">
+                            <pre>${lesson.answers[i]}</pre>
+                        </div>
+                    ` : ''}
                 </div>`;
             }).join('');
 
@@ -1506,6 +2369,22 @@ RENAME TO new_table_name;</div>
                 document.getElementById('sqlEditor').value = "SELECT * FROM employees;";
             } else if (lesson.db === "sandbox") {
                 document.getElementById('sqlEditor').value = "-- All tables available: movies, boxoffice, employees, buildings, north_american_cities\nSELECT * FROM movies;";
+            } else if (lesson.db === "puzzle_library") {
+                document.getElementById('sqlEditor').value = "-- Tables: books, borrowers\nSELECT * FROM books;";
+            } else if (lesson.db === "puzzle_restaurant") {
+                document.getElementById('sqlEditor').value = "-- Tables: menu_items, orders\nSELECT * FROM menu_items;";
+            } else if (lesson.db === "puzzle_music") {
+                document.getElementById('sqlEditor').value = "-- Tables: artists, songs\nSELECT * FROM artists;";
+            } else if (lesson.db === "puzzle_flights") {
+                document.getElementById('sqlEditor').value = "-- Tables: flights, passengers\nSELECT * FROM flights;";
+            } else if (lesson.db === "puzzle_ecommerce") {
+                document.getElementById('sqlEditor').value = "-- Tables: products, customers\nSELECT * FROM products;";
+            } else if (lesson.db === "challenge_hospital") {
+                document.getElementById('sqlEditor').value = "-- Tables: doctors, patients\nSELECT * FROM doctors;";
+            } else if (lesson.db === "challenge_sports") {
+                document.getElementById('sqlEditor').value = "-- Tables: teams, players\nSELECT * FROM teams;";
+            } else if (lesson.db === "challenge_stocks") {
+                document.getElementById('sqlEditor').value = "-- Tables: stocks, trades\nSELECT * FROM stocks;";
             } else {
                 document.getElementById('sqlEditor').value = "";
             }
@@ -1528,6 +2407,18 @@ RENAME TO new_table_name;</div>
                     link.classList.remove('completed');
                 }
             });
+        }
+
+        function toggleAnswer(lessonNum, exerciseIndex) {
+            const answerDiv = document.getElementById(`answer-${lessonNum}-${exerciseIndex}`);
+            const btn = answerDiv.previousElementSibling;
+            if (answerDiv.style.display === 'block') {
+                answerDiv.style.display = 'none';
+                btn.textContent = 'Show Answer';
+            } else {
+                answerDiv.style.display = 'block';
+                btn.textContent = 'Hide Answer';
+            }
         }
 
         function runQuery() {
