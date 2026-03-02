@@ -1,4 +1,4 @@
-export async function runPython(code: string, functionName: string, testCaseInput: string, expectedOutput: string): Promise<any> {
+export async function runPython(code: string, testCases: any[] = []): Promise<any> {
   const isServer = typeof window === 'undefined';
   if (isServer) {
     throw new Error("Pyodide cannot be run on the server. Please run this client-side.");
@@ -6,6 +6,17 @@ export async function runPython(code: string, functionName: string, testCaseInpu
 
   let pyodide = (window as any).pyodide;
   if (!pyodide) {
+      if (!(window as any).loadPyodide) {
+          // Dynamically load pyodide script if not present
+          await new Promise<void>((resolve, reject) => {
+              const script = document.createElement('script');
+              script.src = "https://cdn.jsdelivr.net/pyodide/v0.25.0/full/pyodide.js";
+              script.onload = () => resolve();
+              script.onerror = () => reject(new Error("Failed to load Pyodide script"));
+              document.head.appendChild(script);
+          });
+      }
+
       pyodide = await (window as any).loadPyodide({
           indexURL: "https://cdn.jsdelivr.net/pyodide/v0.25.0/full/"
       });
@@ -13,67 +24,45 @@ export async function runPython(code: string, functionName: string, testCaseInpu
   }
 
   try {
+    // Redirect stdout and stderr to capture print statements and errors
     await pyodide.runPythonAsync(`
 import sys
 import io
-import json
 
 sys.stdout = io.StringIO()
 sys.stderr = io.StringIO()
-
-try:
-    # 1. Execute user code
-    ${code.replace(/^/gm, '    ')}
-
-    # 2. Extract user function
-    user_func = locals().get('${functionName}')
-
-    if user_func:
-        # 3. Parse inputs and expected outputs
-        test_inputs = json.loads('${testCaseInput.replace(/'/g, "\\'")}')
-        expected = json.loads('${expectedOutput.replace(/'/g, "\\'")}')
-
-        # 4. Call user function
-        # Support variable positional/keyword args depending on test case structure
-        if isinstance(test_inputs, dict):
-             result = user_func(**test_inputs)
-        elif isinstance(test_inputs, list):
-             result = user_func(*test_inputs)
-        else:
-             result = user_func(test_inputs)
-
-        # 5. Check Result
-        passed = (result == expected)
-        sys.stdout.write(json.dumps({
-            "passed": passed,
-            "actual": result,
-            "expected": expected,
-            "output": sys.stdout.getvalue()
-        }))
-    else:
-        sys.stderr.write(f"Function '${functionName}' not found in user code.")
-
-except Exception as e:
-    sys.stderr.write(str(e))
-finally:
-    sys.stdout = sys.__stdout__
-    sys.stderr = sys.__stderr__
     `);
 
-    // We expect the standard out to contain the JSON payload, or stderr to contain an error
+    // Execute the user's code
+    await pyodide.runPythonAsync(code);
+
+    // For now, we are just executing the code and returning the output.
+    // In a more robust system, we would run the specific test cases against the defined function.
+
     const outStr = await pyodide.runPythonAsync("sys.stdout.getvalue()");
     const errStr = await pyodide.runPythonAsync("sys.stderr.getvalue()");
 
+    // Restore stdout and stderr
+    await pyodide.runPythonAsync(`
+sys.stdout = sys.__stdout__
+sys.stderr = sys.__stderr__
+    `);
+
     if (errStr) {
-      return { success: false, error: errStr };
+      throw new Error(errStr);
     }
 
-    // In our wrapper, the last line of stdout should be our JSON result.
-    // If user print() statements were executed, they might be mixed in.
-    // We should probably just return the output for now or parse it robustly.
-    return { success: true, result: outStr };
+    return { success: true, output: outStr };
 
   } catch (error: any) {
-    return { success: false, error: error.message };
+    // Ensure we restore stdout/stderr even on error
+    try {
+        await pyodide.runPythonAsync(`
+sys.stdout = sys.__stdout__
+sys.stderr = sys.__stderr__
+        `);
+    } catch(e) {}
+
+    throw new Error(error.message);
   }
 }

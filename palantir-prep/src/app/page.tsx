@@ -1,64 +1,119 @@
-import Image from "next/image";
+"use client";
+
+import { useEffect, useState } from "react";
+import Link from "next/link";
+import { useProgress } from "@/lib/useProgress";
+
+type CurriculumItem = {
+  id: number;
+  type: string;
+  title: string;
+  difficulty: string;
+  description: string;
+};
 
 export default function Home() {
+  const [curriculum, setCurriculum] = useState<CurriculumItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const { progress, isLoaded } = useProgress();
+
+  useEffect(() => {
+    async function fetchCurriculum() {
+      try {
+        const res = await fetch("/api/curriculum");
+        if (!res.ok) throw new Error("Failed to fetch curriculum");
+        const data = await res.json();
+        setCurriculum(data);
+      } catch (error) {
+        console.error("Error fetching curriculum:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchCurriculum();
+  }, []);
+
+  const isCompleted = (id: number) => {
+    return progress.completedProblems.includes(id) || progress.completedLessons.includes(id);
+  };
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+    <div className="min-h-screen bg-zinc-50 dark:bg-black text-foreground font-sans">
+      <header className="border-b border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 px-6 py-4 flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 bg-black dark:bg-white rounded flex items-center justify-center">
+            <span className="text-white dark:text-black font-bold text-xl">P</span>
+          </div>
+          <h1 className="text-xl font-semibold tracking-tight">SWE Prep Workspace</h1>
+        </div>
+        <div className="text-sm font-medium text-zinc-500">
+          {curriculum.filter((item) => isCompleted(item.id)).length} / {curriculum.length} Completed
+        </div>
+      </header>
+
+      <main className="max-w-5xl mx-auto px-6 py-12">
+        <div className="mb-10">
+          <h2 className="text-3xl font-bold tracking-tight mb-2">Curriculum</h2>
+          <p className="text-zinc-600 dark:text-zinc-400">
+            Master SQL and Python fundamentals for your upcoming technical interview.
           </p>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
+
+        {loading || !isLoaded ? (
+          <div className="flex justify-center py-20">
+            <div className="w-8 h-8 border-4 border-zinc-300 border-t-black rounded-full animate-spin dark:border-zinc-700 dark:border-t-white"></div>
+          </div>
+        ) : (
+          <div className="grid gap-4">
+            {curriculum.map((item) => {
+              const completed = isCompleted(item.id);
+              return (
+                <Link
+                  key={item.id}
+                  href={`/workspace/${item.id}`}
+                  className="block group"
+                >
+                  <div className={`p-5 rounded-xl border transition-all duration-200 flex items-center justify-between ${completed ? 'bg-green-50/50 border-green-200 dark:bg-green-950/20 dark:border-green-900/50 hover:bg-green-50 dark:hover:bg-green-900/30' : 'bg-white border-zinc-200 dark:bg-zinc-900 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700 hover:shadow-sm'}`}>
+                    <div className="flex items-center gap-4">
+                      <div className={`w-6 h-6 rounded-full flex items-center justify-center shrink-0 ${completed ? 'bg-green-500 text-white' : 'border-2 border-zinc-300 dark:border-zinc-700'}`}>
+                        {completed && (
+                          <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                          </svg>
+                        )}
+                      </div>
+                      <div>
+                        <div className="flex items-center gap-3 mb-1">
+                          <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400 uppercase tracking-wider">
+                            {item.type}
+                          </span>
+                          <span className={`text-xs font-medium ${
+                            item.difficulty === 'Easy' ? 'text-green-600 dark:text-green-400' :
+                            item.difficulty === 'Medium' ? 'text-amber-600 dark:text-amber-400' :
+                            'text-red-600 dark:text-red-400'
+                          }`}>
+                            {item.difficulty}
+                          </span>
+                        </div>
+                        <h3 className="font-semibold text-lg group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                          {item.title}
+                        </h3>
+                        <p className="text-sm text-zinc-500 dark:text-zinc-500 mt-1 line-clamp-1">
+                          {item.description}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="text-zinc-400 group-hover:text-zinc-600 dark:group-hover:text-zinc-300 transition-colors">
+                      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                      </svg>
+                    </div>
+                  </div>
+                </Link>
+              );
+            })}
+          </div>
+        )}
       </main>
     </div>
   );
