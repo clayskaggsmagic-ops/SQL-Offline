@@ -5,22 +5,22 @@ const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
 export async function POST(req: Request) {
   try {
-    const { problemText, userCode, expectedAnswer, errorMessage } = await req.json();
+    const { problem, description, code, error } = await req.json();
 
     const prompt = `
 You are an expert Palantir Software Engineer acting as a mentor. A candidate is struggling with an interview question.
 
 Problem:
-${problemText}
+${problem}
+
+Description:
+${description}
 
 User's Code:
-${userCode}
-
-Expected Answer / Correct Solution:
-${expectedAnswer || 'N/A'}
+${code}
 
 Execution Error or Test Failure:
-${errorMessage || 'The code did not produce the correct output.'}
+${error || 'The code did not produce the correct output.'}
 
 Please explain to the user:
 1. What went wrong (or where the logical flaw is).

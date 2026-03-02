@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<body>
+  <script src="/public/sql-wasm.js"></script>
+  <script>
+    async function testSQL() {
+      const initSqlJs = window.initSqlJs;
+      const SQL = await initSqlJs({
+        locateFile: file => `/public/${file}`
+      });
+      const db = new SQL.Database();
+      db.run("CREATE TABLE test (col1, col2); INSERT INTO test VALUES (1, 'hello');");
+      const res = db.exec("SELECT * FROM test");
+      console.log(JSON.stringify(res));
+      document.body.innerHTML = JSON.stringify(res);
+    }
+    testSQL();
+  </script>
+</body>
+</html>
