@@ -1,0 +1,314 @@
+/* ============================================
+   LessonContent Styles
+   Premium interactive textbook styling
+   ============================================ */
+
+/* Container */
+.lesson-content {
+  font-size: 0.875rem;
+  line-height: 1.7;
+  color: var(--text-primary, #374151);
+}
+
+.dark .lesson-content {
+  color: var(--text-primary-dark, #d1d5db);
+}
+
+/* ---- Inline Code Keywords ---- */
+.inline-code-keyword {
+  display: inline-block;
+  padding: 1px 7px;
+  margin: 0 1px;
+  font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', ui-monospace, monospace;
+  font-size: 0.8em;
+  font-weight: 700;
+  line-height: 1.6;
+  color: #1e1b4b !important;
+  background: linear-gradient(135deg, #eef2ff, #e0e7ff) !important;
+  border: 1px solid #a5b4fc !important;
+  border-radius: 5px;
+  white-space: nowrap;
+  transition: all 0.15s ease;
+}
+
+.dark .inline-code-keyword {
+  color: #93c5fd;
+  background: linear-gradient(135deg, rgba(30, 58, 138, 0.35), rgba(29, 78, 216, 0.25));
+  border-color: rgba(59, 130, 246, 0.3);
+}
+
+.inline-code-keyword:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(37, 99, 235, 0.15);
+}
+
+.dark .inline-code-keyword:hover {
+  box-shadow: 0 2px 6px rgba(59, 130, 246, 0.2);
+}
+
+/* ---- Code Blocks ---- */
+.code-block-wrapper {
+  position: relative;
+  margin: 16px 0;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid #e4e4e7;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+.dark .code-block-wrapper {
+  border-color: #27272a;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2), 0 1px 2px rgba(0, 0, 0, 0.15);
+}
+
+.code-block {
+  margin: 0 !important;
+  padding: 16px 20px !important;
+  background: #1e1e2e !important;
+  font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', ui-monospace, monospace !important;
+  font-size: 0.8rem !important;
+  line-height: 1.65 !important;
+  overflow-x: auto;
+  tab-size: 2;
+}
+
+.code-block code {
+  background: transparent !important;
+  padding: 0 !important;
+  border: none !important;
+  font-size: inherit !important;
+  color: #cdd6f4 !important;
+}
+
+/* ---- Callout Boxes ---- */
+.callout {
+  margin: 16px 0;
+  padding: 14px 16px;
+  border-radius: 10px;
+  border-left: 4px solid;
+}
+
+.callout p {
+  margin-bottom: 0 !important;
+}
+
+.callout p:first-child {
+  margin-top: 0;
+}
+
+.callout-tip {
+  background: linear-gradient(135deg, #f0fdf4, #ecfdf5);
+  border-color: #22c55e;
+  color: #166534;
+}
+
+.dark .callout-tip {
+  background: linear-gradient(135deg, rgba(22, 101, 52, 0.15), rgba(21, 128, 61, 0.1));
+  border-color: #22c55e;
+  color: #86efac;
+}
+
+.callout-warning {
+  background: linear-gradient(135deg, #fffbeb, #fef3c7);
+  border-color: #f59e0b;
+  color: #92400e;
+}
+
+.dark .callout-warning {
+  background: linear-gradient(135deg, rgba(146, 64, 14, 0.15), rgba(180, 83, 9, 0.1));
+  border-color: #f59e0b;
+  color: #fcd34d;
+}
+
+.callout-note {
+  background: linear-gradient(135deg, #eff6ff, #dbeafe);
+  border-color: #3b82f6;
+  color: #1e40af;
+}
+
+.dark .callout-note {
+  background: linear-gradient(135deg, rgba(30, 64, 175, 0.15), rgba(37, 99, 235, 0.1));
+  border-color: #3b82f6;
+  color: #93c5fd;
+}
+
+.callout-default {
+  background: linear-gradient(135deg, #f4f4f5, #fafafa);
+  border-color: #a1a1aa;
+  color: #3f3f46;
+}
+
+.dark .callout-default {
+  background: linear-gradient(135deg, rgba(63, 63, 70, 0.2), rgba(82, 82, 91, 0.15));
+  border-color: #52525b;
+  color: #d4d4d8;
+}
+
+.callout-content {
+  font-size: 0.825rem;
+  line-height: 1.6;
+}
+
+/* ---- Lists ---- */
+.lesson-list {
+  margin: 12px 0;
+  padding-left: 24px;
+}
+
+.lesson-list-unordered {
+  list-style: none;
+}
+
+.lesson-list-unordered>.lesson-list-item::before {
+  content: '▸';
+  color: #3b82f6;
+  font-weight: bold;
+  display: inline-block;
+  width: 1em;
+  margin-left: -1.2em;
+  margin-right: 0.2em;
+}
+
+.dark .lesson-list-unordered>.lesson-list-item::before {
+  color: #60a5fa;
+}
+
+.lesson-list-ordered {
+  list-style: none;
+  counter-reset: lesson-counter;
+}
+
+.lesson-list-ordered>.lesson-list-item {
+  counter-increment: lesson-counter;
+}
+
+.lesson-list-ordered>.lesson-list-item::before {
+  content: counter(lesson-counter) '.';
+  color: #3b82f6;
+  font-weight: 700;
+  font-size: 0.85em;
+  display: inline-block;
+  width: 1.5em;
+  margin-left: -1.7em;
+  margin-right: 0.2em;
+}
+
+.dark .lesson-list-ordered>.lesson-list-item::before {
+  color: #60a5fa;
+}
+
+.lesson-list-item {
+  margin-bottom: 6px;
+  font-size: 0.875rem;
+  line-height: 1.6;
+  color: #374151;
+}
+
+.dark .lesson-list-item {
+  color: #d1d5db;
+}
+
+/* ---- Tables ---- */
+.lesson-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.8rem;
+}
+
+.lesson-table th {
+  background: #f4f4f5;
+  font-weight: 600;
+}
+
+.dark .lesson-table th {
+  background: #27272a;
+}
+
+.lesson-table td,
+.lesson-table th {
+  padding: 8px 12px;
+  text-align: left;
+  border-bottom: 1px solid #e4e4e7;
+}
+
+.dark .lesson-table td,
+.dark .lesson-table th {
+  border-bottom-color: #27272a;
+}
+
+.lesson-table tr:hover td {
+  background: #fafafa;
+}
+
+.dark .lesson-table tr:hover td {
+  background: rgba(63, 63, 70, 0.3);
+}
+
+/* ---- highlight.js theme overrides for code blocks ---- */
+.code-block .hljs-keyword {
+  color: #cba6f7;
+}
+
+.code-block .hljs-string {
+  color: #a6e3a1;
+}
+
+.code-block .hljs-number {
+  color: #fab387;
+}
+
+.code-block .hljs-built_in {
+  color: #89b4fa;
+}
+
+.code-block .hljs-title {
+  color: #89dceb;
+}
+
+.code-block .hljs-comment {
+  color: #6c7086;
+  font-style: italic;
+}
+
+.code-block .hljs-operator {
+  color: #89dceb;
+}
+
+.code-block .hljs-punctuation {
+  color: #bac2de;
+}
+
+.code-block .hljs-type {
+  color: #f9e2af;
+}
+
+.code-block .hljs-params {
+  color: #f2cdcd;
+}
+
+.code-block .hljs-function {
+  color: #89b4fa;
+}
+
+.code-block .hljs-attr {
+  color: #f9e2af;
+}
+
+/* Scrollbar for code blocks */
+.code-block::-webkit-scrollbar {
+  height: 6px;
+}
+
+.code-block::-webkit-scrollbar-track {
+  background: #313244;
+  border-radius: 3px;
+}
+
+.code-block::-webkit-scrollbar-thumb {
+  background: #45475a;
+  border-radius: 3px;
+}
+
+.code-block::-webkit-scrollbar-thumb:hover {
+  background: #585b70;
+}

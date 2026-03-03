@@ -16,11 +16,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="dark">
+    <html lang="en" className="dark" suppressHydrationWarning>
       <head>
-         <Script src="https://cdn.jsdelivr.net/pyodide/v0.25.0/full/pyodide.js" strategy="beforeInteractive" />
+        <Script src="https://cdn.jsdelivr.net/pyodide/v0.25.0/full/pyodide.js" strategy="beforeInteractive" />
       </head>
-      <body className={`${inter.className} bg-[#0d0d0d] text-zinc-300 min-h-screen`}>
+      <body className={`${inter.className} bg-[#0d0d0d] text-zinc-300 min-h-screen`} suppressHydrationWarning>
         {children}
       </body>
     </html>

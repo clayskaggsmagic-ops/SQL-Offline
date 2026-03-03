@@ -3,12 +3,14 @@ import { useState, useEffect } from 'react';
 export interface ProgressState {
   completedLessons: number[];
   completedProblems: number[];
+  starredProblems: number[];
   codeDrafts: Record<number, string>; // problem_id -> string
 }
 
 const defaultState: ProgressState = {
   completedLessons: [],
   completedProblems: [],
+  starredProblems: [],
   codeDrafts: {}
 };
 
@@ -65,11 +67,23 @@ export function useProgress() {
     });
   };
 
+  const toggleStar = (problemId: number) => {
+    const starred = progress.starredProblems || [];
+    const isStarred = starred.includes(problemId);
+    saveProgress({
+      ...progress,
+      starredProblems: isStarred
+        ? starred.filter(id => id !== problemId)
+        : [...starred, problemId]
+    });
+  };
+
   return {
     progress,
     isLoaded,
     markProblemCompleted,
     markLessonCompleted,
-    saveCodeDraft
+    saveCodeDraft,
+    toggleStar
   };
 }

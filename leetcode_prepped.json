@@ -1,0 +1,1172 @@
+[
+  {
+    "id": 25,
+    "title": "CASE WHEN: Conditional Expressions",
+    "category": "SQL",
+    "difficulty": "Medium",
+    "module_id": "7",
+    "module_name": "Conditional Logic & CASE",
+    "lesson_order": 1,
+    "description": "## \ud83c\udfaf CASE WHEN: Conditional Expressions\n\nThe `CASE` expression lets you add **if/then/else** logic directly inside a SQL query. It works like a switch statement.\n\n### Syntax\n```sql\nSELECT col,\n  CASE\n    WHEN condition1 THEN result1\n    WHEN condition2 THEN result2\n    ELSE default_result\n  END AS alias\nFROM table;\n```\n\n### Key Points\n- `CASE` can appear in `SELECT`, `WHERE`, `ORDER BY`, and even inside aggregates\n- Always end with `END`\n- `ELSE` is optional (returns NULL if omitted)\n- **Inside aggregates**: `SUM(CASE WHEN x THEN 1 ELSE 0 END)` counts conditionally\n\nTable: **Students** (id PK, name, score)\n\n---\n\n## \u270f\ufe0f Exercise\n\nClassify each student's grade:\n- score >= 90 \u2192 'A'\n- score >= 80 \u2192 'B'\n- score >= 70 \u2192 'C'\n- else \u2192 'F'\n\nReturn name, score, and grade.",
+    "initial_code": "-- Classify each student's grade using CASE WHEN\nSELECT name, score,\n  CASE\n    ",
+    "solution_code": "SELECT name, score,\n  CASE\n    WHEN score >= 90 THEN 'A'\n    WHEN score >= 80 THEN 'B'\n    WHEN score >= 70 THEN 'C'\n    ELSE 'F'\n  END AS grade\nFROM Students;",
+    "context_sql": "CREATE TABLE Students (id INTEGER PRIMARY KEY, name TEXT, score INTEGER);\nINSERT INTO Students VALUES (1, 'Alice', 95);\nINSERT INTO Students VALUES (2, 'Bob', 82);\nINSERT INTO Students VALUES (3, 'Charlie', 71);\nINSERT INTO Students VALUES (4, 'Diana', 58);",
+    "lesson_syntax": "CASE WHEN cond THEN result WHEN cond2 THEN result2 ELSE default END AS alias;\nSUM(CASE WHEN cond THEN 1 ELSE 0 END) -- conditional counting;",
+    "test_cases": [
+      {
+        "expected_output": "name|score|grade\nAlice|95|A\nBob|82|B\nCharlie|71|C\nDiana|58|F",
+        "is_hidden": false
+      }
+    ]
+  },
+  {
+    "id": 26,
+    "title": "String Functions (SUBSTR, UPPER, LOWER, LENGTH)",
+    "category": "SQL",
+    "difficulty": "Medium",
+    "module_id": "8",
+    "module_name": "String & Date Functions",
+    "lesson_order": 1,
+    "description": "## \ud83c\udfaf String Functions\n\nSQL provides built-in functions to manipulate text data.\n\n### Key Functions\n| Function | Description | Example |\n|----------|-------------|---------|\n| `LENGTH(str)` | Character count | `LENGTH('hello')` \u2192 5 |\n| `UPPER(str)` | Uppercase | `UPPER('hello')` \u2192 'HELLO' |\n| `LOWER(str)` | Lowercase | `LOWER('HELLO')` \u2192 'hello' |\n| `SUBSTR(str, start, len)` | Extract substring | `SUBSTR('hello', 1, 3)` \u2192 'hel' |\n| `\\|\\|` | Concatenation | `'a' \\|\\| 'b'` \u2192 'ab' |\n| `REPLACE(str, old, new)` | Replace text | `REPLACE('abc', 'b', 'x')` \u2192 'axc' |\n| `TRIM(str)` | Remove whitespace | `TRIM('  hi  ')` \u2192 'hi' |\n| `INSTR(str, sub)` | Find position | `INSTR('hello', 'l')` \u2192 3 |\n\nTable: **Employees** (id PK, first_name, last_name, email)\n\n---\n\n## \u270f\ufe0f Exercise\n\nCreate a report showing each employee's **full name** (First Last) in proper case (first letter capitalized) and the **length** of their email.",
+    "initial_code": "-- Build full name and email length\nSELECT ",
+    "solution_code": "SELECT\n  UPPER(SUBSTR(first_name, 1, 1)) || LOWER(SUBSTR(first_name, 2))\n  || ' ' ||\n  UPPER(SUBSTR(last_name, 1, 1)) || LOWER(SUBSTR(last_name, 2))\n  AS full_name,\n  LENGTH(email) AS email_length\nFROM Employees;",
+    "context_sql": "CREATE TABLE Employees (id INTEGER PRIMARY KEY, first_name TEXT, last_name TEXT, email TEXT);\nINSERT INTO Employees VALUES (1, 'aLICE', 'jOHNSON', 'alice.j@company.com');\nINSERT INTO Employees VALUES (2, 'BOB', 'smith', 'bsmith@company.com');\nINSERT INTO Employees VALUES (3, 'charlie', 'BROWN', 'cb@company.com');",
+    "lesson_syntax": "UPPER(SUBSTR(col, 1, 1)) || LOWER(SUBSTR(col, 2)) -- proper case;\nLENGTH(col) -- character count;\nREPLACE(col, 'old', 'new') -- substitution;\nINSTR(col, 'substr') -- find position;",
+    "test_cases": [
+      {
+        "expected_output": "full_name|email_length\nAlice Johnson|19\nBob Smith|18\nCharlie Brown|14",
+        "is_hidden": false
+      }
+    ]
+  },
+  {
+    "id": 27,
+    "title": "Date Functions (DATE, date arithmetic, BETWEEN)",
+    "category": "SQL",
+    "difficulty": "Medium",
+    "module_id": "8",
+    "module_name": "String & Date Functions",
+    "lesson_order": 2,
+    "description": "## \ud83c\udfaf Date Functions\n\nSQLite stores dates as **text** in ISO format (`YYYY-MM-DD`). Special functions let you do date math.\n\n### Key Functions\n| Function | Description | Example |\n|----------|-------------|---------|\n| `DATE(str)` | Parse a date | `DATE('2024-03-15')` |\n| `DATE(str, modifier)` | Add/subtract days | `DATE('2024-03-15', '+7 days')` |\n| `DATE(str, '-N days')` | Go back N days | `DATE('2024-03-15', '-30 days')` |\n| `SUBSTR(date, 1, 7)` | Extract year-month | `SUBSTR('2024-03-15', 1, 7)` \u2192 '2024-03' |\n| `date BETWEEN a AND b` | Date range filter | `WHERE date BETWEEN '2024-01-01' AND '2024-12-31'` |\n| `date LIKE '2024-03%'` | Match year-month | `WHERE date LIKE '2024-03%'` |\n\nTable: **Events** (id PK, event_name, event_date TEXT)\n\n---\n\n## \u270f\ufe0f Exercise\n\nFind all events that occurred **within 7 days** of '2024-03-15' (inclusive, both before and after). Return the event name and how many days from March 15th.",
+    "initial_code": "-- Find events within 7 days of 2024-03-15\nSELECT ",
+    "solution_code": "SELECT event_name, event_date,\n  CAST(JULIANDAY(event_date) - JULIANDAY('2024-03-15') AS INTEGER) AS days_diff\nFROM Events\nWHERE event_date BETWEEN DATE('2024-03-15', '-7 days') AND DATE('2024-03-15', '+7 days')\nORDER BY event_date;",
+    "context_sql": "CREATE TABLE Events (id INTEGER PRIMARY KEY, event_name TEXT, event_date TEXT);\nINSERT INTO Events VALUES (1, 'Conference', '2024-03-10');\nINSERT INTO Events VALUES (2, 'Workshop', '2024-03-14');\nINSERT INTO Events VALUES (3, 'Hackathon', '2024-03-15');\nINSERT INTO Events VALUES (4, 'Meetup', '2024-03-20');\nINSERT INTO Events VALUES (5, 'Gala', '2024-03-25');\nINSERT INTO Events VALUES (6, 'Sprint', '2024-03-01');",
+    "lesson_syntax": "DATE('YYYY-MM-DD', '+N days') -- date arithmetic;\nBETWEEN DATE(...) AND DATE(...) -- date ranges;\nSUBSTR(date, 1, 7) -- extract year-month;\nJULIANDAY(date) -- for day differences;\ndate LIKE '2024-03%' -- month matching;",
+    "test_cases": [
+      {
+        "expected_output": "event_name|event_date|days_diff\nConference|2024-03-10|-5\nWorkshop|2024-03-14|-1\nHackathon|2024-03-15|0\nMeetup|2024-03-20|5",
+        "is_hidden": false
+      }
+    ]
+  },
+  {
+    "id": 28,
+    "title": "Self-JOINs: Joining a Table to Itself",
+    "category": "SQL",
+    "difficulty": "Medium",
+    "module_id": "9",
+    "module_name": "Self-JOINs & Advanced Patterns",
+    "lesson_order": 1,
+    "description": "## \ud83c\udfaf Self-JOINs\n\nA **self-join** joins a table to **itself** using aliases. This is essential when rows reference other rows in the same table (like manager \u2192 employee).\n\n### Syntax\n```sql\nSELECT a.col, b.col\nFROM MyTable a\nJOIN MyTable b ON a.related_id = b.id;\n```\n\n### Common Patterns\n1. **Hierarchy**: employee \u2192 manager relationships\n2. **Consecutive**: comparing row N with row N+1 (via `id + 1`)\n3. **Proximity**: finding nearby records (via `ABS(a.id - b.id) = 1`)\n\nTable: **Employees** (id PK, name, manager_id)\n\n---\n\n## \u270f\ufe0f Exercise\n\nFor each employee who has a manager, show the employee name and their manager's name.",
+    "initial_code": "-- Show employee name and their manager's name\nSELECT ",
+    "solution_code": "SELECT e.name AS employee, m.name AS manager\nFROM Employees e\nJOIN Employees m ON e.manager_id = m.id;",
+    "context_sql": "CREATE TABLE Employees (id INTEGER PRIMARY KEY, name TEXT, manager_id INTEGER);\nINSERT INTO Employees VALUES (1, 'Alice', NULL);\nINSERT INTO Employees VALUES (2, 'Bob', 1);\nINSERT INTO Employees VALUES (3, 'Charlie', 1);\nINSERT INTO Employees VALUES (4, 'Diana', 2);\nINSERT INTO Employees VALUES (5, 'Eve', 2);",
+    "lesson_syntax": "SELECT e.col, m.col FROM table e JOIN table m ON e.fk = m.pk; -- self-join;\nJOIN table t2 ON t1.id = t2.id - 1 -- consecutive rows;\nJOIN table t2 ON ABS(t1.id - t2.id) = 1 -- adjacent rows;",
+    "test_cases": [
+      {
+        "expected_output": "employee|manager\nBob|Alice\nCharlie|Alice\nDiana|Bob\nEve|Bob",
+        "is_hidden": false
+      }
+    ]
+  },
+  {
+    "id": 29,
+    "title": "Correlated Subqueries",
+    "category": "SQL",
+    "difficulty": "Hard",
+    "module_id": "9",
+    "module_name": "Self-JOINs & Advanced Patterns",
+    "lesson_order": 2,
+    "description": "## \ud83c\udfaf Correlated Subqueries\n\nA **correlated subquery** references columns from the **outer query**. It runs once per row of the outer query.\n\n### Syntax\n```sql\nSELECT col, (\n  SELECT AGG(inner.col)\n  FROM table inner\n  WHERE inner.group_col = outer.group_col  -- correlation!\n) AS computed\nFROM table outer;\n```\n\n### Patterns\n- **Running totals**: `(SELECT SUM(x) FROM t2 WHERE t2.id <= t1.id)`\n- **Top-N per group**: `WHERE (SELECT COUNT(DISTINCT ...) ...) < N`\n- **Last value before date**: `ORDER BY date DESC LIMIT 1` inside subquery\n\nTable: **Sales** (id PK, product, amount, sale_date)\n\n---\n\n## \u270f\ufe0f Exercise\n\nFor each sale, show the product, amount, and the **running total** of sales amounts (all sales with id <= current id).",
+    "initial_code": "-- Show each sale with a running total\nSELECT ",
+    "solution_code": "SELECT s1.product, s1.amount,\n  (SELECT SUM(s2.amount) FROM Sales s2 WHERE s2.id <= s1.id) AS running_total\nFROM Sales s1\nORDER BY s1.id;",
+    "context_sql": "CREATE TABLE Sales (id INTEGER PRIMARY KEY, product TEXT, amount INTEGER, sale_date TEXT);\nINSERT INTO Sales VALUES (1, 'Widget', 100, '2024-01-01');\nINSERT INTO Sales VALUES (2, 'Gadget', 250, '2024-01-02');\nINSERT INTO Sales VALUES (3, 'Widget', 150, '2024-01-03');\nINSERT INTO Sales VALUES (4, 'Gizmo', 300, '2024-01-04');",
+    "lesson_syntax": "(SELECT SUM(col) FROM t WHERE t.id <= outer.id) -- running total;\n(SELECT col FROM t WHERE t.group = outer.group ORDER BY col DESC LIMIT 1) -- last value;\nWHERE (SELECT COUNT(DISTINCT col) FROM t WHERE ...) < N -- top-N per group;",
+    "test_cases": [
+      {
+        "expected_output": "product|amount|running_total\nWidget|100|100\nGadget|250|350\nWidget|150|500\nGizmo|300|800",
+        "is_hidden": false
+      }
+    ]
+  },
+  {
+    "id": 30,
+    "title": "Complex Joins & Multi-Step Analysis",
+    "category": "SQL",
+    "difficulty": "Hard",
+    "module_id": "10",
+    "module_name": "Real-World Query Challenges",
+    "lesson_order": 1,
+    "description": "## \ud83c\udfaf Complex Joins & Multi-Step Analysis\n\nReal-world SQL often requires combining **multiple techniques** in one query:\n\n### Patterns You'll Use\n1. **JOIN + Subquery**: Filter with a derived table, then JOIN for details\n2. **LEFT JOIN + Aggregate in ON**: e.g. `LEFT JOIN Orders ON ... AND order_date LIKE '2024%'`\n3. **Multi-step**: First find groups (subquery), then get details (outer query)\n4. **Moving windows**: Correlated subqueries with date ranges for averages\n\n### Strategy\n1. Break the problem into **steps** \u2014 what do you need first?\n2. Write each step as a subquery or CTE\n3. Combine with JOINs\n\nTable: **Customers** (id PK, name, signup_date)\nTable: **Orders** (id PK, customer_id FK, amount, order_date)\n\n---\n\n## \u270f\ufe0f Exercise\n\nFor each customer, show their name, signup date, **total orders**, and **total spent**. Include customers who have never ordered (show 0).",
+    "initial_code": "-- Customer summary with order totals\nSELECT ",
+    "solution_code": "SELECT c.name, c.signup_date,\n  COUNT(o.id) AS total_orders,\n  COALESCE(SUM(o.amount), 0) AS total_spent\nFROM Customers c\nLEFT JOIN Orders o ON c.id = o.customer_id\nGROUP BY c.id, c.name, c.signup_date;",
+    "context_sql": "CREATE TABLE Customers (id INTEGER PRIMARY KEY, name TEXT, signup_date TEXT);\nCREATE TABLE Orders (id INTEGER PRIMARY KEY, customer_id INTEGER, amount INTEGER, order_date TEXT);\nINSERT INTO Customers VALUES (1, 'Alice', '2024-01-15');\nINSERT INTO Customers VALUES (2, 'Bob', '2024-02-01');\nINSERT INTO Customers VALUES (3, 'Charlie', '2024-03-10');\nINSERT INTO Orders VALUES (1, 1, 100, '2024-02-01');\nINSERT INTO Orders VALUES (2, 1, 200, '2024-03-01');\nINSERT INTO Orders VALUES (3, 2, 150, '2024-03-15');",
+    "lesson_syntax": "LEFT JOIN + GROUP BY + COALESCE(SUM(), 0) -- include empty groups;\nJOIN (subquery) sub ON ... -- derived table join;\nLEFT JOIN ... ON t1.id = t2.fk AND t2.date LIKE '2024%' -- filter in ON;",
+    "test_cases": [
+      {
+        "expected_output": "name|signup_date|total_orders|total_spent\nAlice|2024-01-15|2|300\nBob|2024-02-01|1|150\nCharlie|2024-03-10|0|0",
+        "is_hidden": false
+      }
+    ]
+  },
+  {
+    "leetcode_num": 1757,
+    "title": "Recyclable and Low Fat Products",
+    "difficulty": "Easy",
+    "description": "## \ud83c\udfaf Recyclable and Low Fat Products\n\nTable: **Products**\n\n| Column Name | Type |\n|---|---|\n| product_id | int (PK) |\n| low_fats | enum('Y','N') |\n| recyclable | enum('Y','N') |\n\n---\n\n## \u270f\ufe0f Exercise\n\nFind the IDs of products that are **both** low fat and recyclable.\n\nReturn the result table in any order.\n\n**Example:**\n```\nInput:\n| product_id | low_fats | recyclable |\n|------------|----------|------------|\n| 0          | Y        | N          |\n| 1          | Y        | Y          |\n| 2          | N        | Y          |\n| 3          | Y        | Y          |\n| 4          | N        | N          |\n\nOutput:\n| product_id |\n|------------|\n| 1          |\n| 3          |\n```",
+    "initial_code": "-- Find products that are both low fat and recyclable\nSELECT ",
+    "solution_code": "SELECT product_id\nFROM Products\nWHERE low_fats = 'Y' AND recyclable = 'Y';",
+    "context_sql": "CREATE TABLE Products (product_id INTEGER PRIMARY KEY, low_fats TEXT, recyclable TEXT);\nINSERT INTO Products VALUES (0, 'Y', 'N');\nINSERT INTO Products VALUES (1, 'Y', 'Y');\nINSERT INTO Products VALUES (2, 'N', 'Y');\nINSERT INTO Products VALUES (3, 'Y', 'Y');\nINSERT INTO Products VALUES (4, 'N', 'N');",
+    "lesson_syntax": "SELECT col FROM table WHERE cond1 AND cond2;",
+    "test_cases": [
+      {
+        "expected_output": "product_id\n1\n3",
+        "is_hidden": false
+      }
+    ],
+    "category": "SQL",
+    "module_id": "1",
+    "module_name": "Introduction to Queries",
+    "lesson_order": 7,
+    "id": 31
+  },
+  {
+    "leetcode_num": 584,
+    "title": "Find Customer Referee",
+    "difficulty": "Easy",
+    "description": "## \ud83c\udfaf Find Customer Referee\n\nTable: **Customer**\n\n| Column Name | Type |\n|---|---|\n| id | int (PK) |\n| name | varchar |\n| referee_id | int |\n\n---\n\n## \u270f\ufe0f Exercise\n\nFind the names of customers that are **not** referred by the customer with `id = 2`.\n\n**Example:**\n```\nInput:\n| id | name | referee_id |\n|----|------|------------|\n| 1  | Will | null       |\n| 2  | Jane | null       |\n| 3  | Alex | 2          |\n| 4  | Bill | null       |\n| 5  | Zack | 1          |\n| 6  | Mark | 2          |\n\nOutput:\n| name |\n|------|\n| Will |\n| Jane |\n| Bill |\n| Zack |\n```",
+    "initial_code": "-- Find customers NOT referred by id=2\nSELECT ",
+    "solution_code": "SELECT name\nFROM Customer\nWHERE referee_id != 2 OR referee_id IS NULL;",
+    "context_sql": "CREATE TABLE Customer (id INTEGER PRIMARY KEY, name TEXT, referee_id INTEGER);\nINSERT INTO Customer VALUES (1, 'Will', NULL);\nINSERT INTO Customer VALUES (2, 'Jane', NULL);\nINSERT INTO Customer VALUES (3, 'Alex', 2);\nINSERT INTO Customer VALUES (4, 'Bill', NULL);\nINSERT INTO Customer VALUES (5, 'Zack', 1);\nINSERT INTO Customer VALUES (6, 'Mark', 2);",
+    "lesson_syntax": "SELECT col FROM table WHERE col != val OR col IS NULL;",
+    "test_cases": [
+      {
+        "expected_output": "name\nWill\nJane\nBill\nZack",
+        "is_hidden": false
+      }
+    ],
+    "category": "SQL",
+    "module_id": "1",
+    "module_name": "Introduction to Queries",
+    "lesson_order": 8,
+    "id": 32
+  },
+  {
+    "leetcode_num": 595,
+    "title": "Big Countries",
+    "difficulty": "Easy",
+    "description": "## \ud83c\udfaf Big Countries\n\nTable: **World**\n\n| Column Name | Type |\n|---|---|\n| name | varchar (PK) |\n| continent | varchar |\n| area | int |\n| population | int |\n| gdp | bigint |\n\nA country is **big** if it has area >= 3,000,000 OR population >= 25,000,000.\n\n---\n\n## \u270f\ufe0f Exercise\n\nFind the name, population, and area of the big countries.\n\n**Example:**\n```\nInput:\n| name        | continent | area    | population | gdp          |\n|-------------|-----------|---------|------------|--------------|\n| Afghanistan | Asia      | 652230  | 25500100   | 20343000000  |\n| Albania     | Europe    | 28748   | 2831741    | 12960000000  |\n| Algeria     | Africa    | 2381741 | 37100000   | 188681000000 |\n| Andorra     | Europe    | 468     | 78115      | 3712000000   |\n| Angola      | Africa    | 1246700 | 20609294   | 100990000000 |\n\nOutput:\n| name        | population | area    |\n|-------------|------------|---------|\n| Afghanistan | 25500100   | 652230  |\n| Algeria     | 37100000   | 2381741 |\n```",
+    "initial_code": "-- Find big countries (area >= 3000000 OR population >= 25000000)\nSELECT ",
+    "solution_code": "SELECT name, population, area\nFROM World\nWHERE area >= 3000000 OR population >= 25000000;",
+    "context_sql": "CREATE TABLE World (name TEXT PRIMARY KEY, continent TEXT, area INTEGER, population INTEGER, gdp INTEGER);\nINSERT INTO World VALUES ('Afghanistan', 'Asia', 652230, 25500100, 20343000000);\nINSERT INTO World VALUES ('Albania', 'Europe', 28748, 2831741, 12960000000);\nINSERT INTO World VALUES ('Algeria', 'Africa', 2381741, 37100000, 188681000000);\nINSERT INTO World VALUES ('Andorra', 'Europe', 468, 78115, 3712000000);\nINSERT INTO World VALUES ('Angola', 'Africa', 1246700, 20609294, 100990000000);",
+    "lesson_syntax": "SELECT col1, col2 FROM table WHERE cond1 OR cond2;",
+    "test_cases": [
+      {
+        "expected_output": "name|population|area\nAfghanistan|25500100|652230\nAlgeria|37100000|2381741",
+        "is_hidden": false
+      }
+    ],
+    "category": "SQL",
+    "module_id": "1",
+    "module_name": "Introduction to Queries",
+    "lesson_order": 9,
+    "id": 33
+  },
+  {
+    "leetcode_num": 1148,
+    "title": "Article Views I",
+    "difficulty": "Easy",
+    "description": "## \ud83c\udfaf Article Views I\n\nTable: **Views**\n\n| Column Name | Type |\n|---|---|\n| article_id | int |\n| author_id | int |\n| viewer_id | int |\n| view_date | date |\n\nNo primary key. May contain duplicates.\n\n---\n\n## \u270f\ufe0f Exercise\n\nFind all the authors that viewed at least one of their own articles. Return the result sorted by `id` in ascending order.\n\n**Example:**\n```\nInput:\n| article_id | author_id | viewer_id | view_date  |\n|------------|-----------|-----------|------------|\n| 1          | 3         | 5         | 2019-08-01 |\n| 1          | 3         | 6         | 2019-08-02 |\n| 2          | 7         | 7         | 2019-08-01 |\n| 2          | 7         | 6         | 2019-08-02 |\n| 4          | 7         | 1         | 2019-07-22 |\n| 3          | 4         | 4         | 2019-07-21 |\n| 3          | 4         | 4         | 2019-07-21 |\n\nOutput:\n| id |\n|----|\n| 4  |\n| 7  |\n```",
+    "initial_code": "-- Find authors who viewed their own articles\nSELECT ",
+    "solution_code": "SELECT DISTINCT author_id AS id\nFROM Views\nWHERE author_id = viewer_id\nORDER BY id ASC;",
+    "context_sql": "CREATE TABLE Views (article_id INTEGER, author_id INTEGER, viewer_id INTEGER, view_date TEXT);\nINSERT INTO Views VALUES (1, 3, 5, '2019-08-01');\nINSERT INTO Views VALUES (1, 3, 6, '2019-08-02');\nINSERT INTO Views VALUES (2, 7, 7, '2019-08-01');\nINSERT INTO Views VALUES (2, 7, 6, '2019-08-02');\nINSERT INTO Views VALUES (4, 7, 1, '2019-07-22');\nINSERT INTO Views VALUES (3, 4, 4, '2019-07-21');\nINSERT INTO Views VALUES (3, 4, 4, '2019-07-21');",
+    "lesson_syntax": "SELECT DISTINCT col AS alias FROM table WHERE cond ORDER BY col;",
+    "test_cases": [
+      {
+        "expected_output": "id\n4\n7",
+        "is_hidden": false
+      }
+    ],
+    "category": "SQL",
+    "module_id": "1",
+    "module_name": "Introduction to Queries",
+    "lesson_order": 10,
+    "id": 34
+  },
+  {
+    "leetcode_num": 1683,
+    "title": "Invalid Tweets",
+    "difficulty": "Easy",
+    "description": "## \ud83c\udfaf Invalid Tweets\n\nTable: **Tweets**\n\n| Column Name | Type |\n|---|---|\n| tweet_id | int (PK) |\n| content | varchar |\n\n---\n\n## \u270f\ufe0f Exercise\n\nFind the IDs of the invalid tweets. A tweet is invalid if the number of characters in the content is **strictly greater than 15**.\n\n**Example:**\n```\nInput:\n| tweet_id | content                          |\n|----------|----------------------------------|\n| 1        | Vote for Biden                   |\n| 2        | Let us make America great again! |\n\nOutput:\n| tweet_id |\n|----------|\n| 2        |\n```",
+    "initial_code": "-- Find tweets with content > 15 characters\nSELECT ",
+    "solution_code": "SELECT tweet_id\nFROM Tweets\nWHERE LENGTH(content) > 15;",
+    "context_sql": "CREATE TABLE Tweets (tweet_id INTEGER PRIMARY KEY, content TEXT);\nINSERT INTO Tweets VALUES (1, 'Vote for Biden');\nINSERT INTO Tweets VALUES (2, 'Let us make America great again!');",
+    "lesson_syntax": "SELECT col FROM table WHERE LENGTH(col) > n;",
+    "test_cases": [
+      {
+        "expected_output": "tweet_id\n2",
+        "is_hidden": false
+      }
+    ],
+    "category": "SQL",
+    "module_id": "8",
+    "module_name": "String & Date Functions",
+    "lesson_order": 3,
+    "id": 35
+  },
+  {
+    "leetcode_num": 1378,
+    "title": "Replace Employee ID With The Unique Identifier",
+    "difficulty": "Easy",
+    "description": "## \ud83c\udfaf Replace Employee ID With The Unique Identifier\n\nTable: **Employees**\n\n| Column Name | Type |\n|---|---|\n| id | int (PK) |\n| name | varchar |\n\nTable: **EmployeeUNI**\n\n| Column Name | Type |\n|---|---|\n| id | int |\n| unique_id | int |\n\n(id, unique_id) is the primary key.\n\n---\n\n## \u270f\ufe0f Exercise\n\nShow the unique ID of each employee. If an employee does not have a unique ID, show `null`.\n\n**Example:**\n```\nInput:\nEmployees: [(1,'Alice'),(7,'Bob'),(11,'Meir'),(90,'Winston'),(3,'Jonathan')]\nEmployeeUNI: [(3,1),(11,2),(90,3)]\n\nOutput:\n| unique_id | name     |\n|-----------|----------|\n| null      | Alice    |\n| null      | Bob      |\n| 2         | Meir     |\n| 3         | Winston  |\n| 1         | Jonathan |\n```",
+    "initial_code": "-- Show each employee's unique_id (null if none)\nSELECT ",
+    "solution_code": "SELECT eu.unique_id, e.name\nFROM Employees e\nLEFT JOIN EmployeeUNI eu ON e.id = eu.id;",
+    "context_sql": "CREATE TABLE Employees (id INTEGER PRIMARY KEY, name TEXT);\nCREATE TABLE EmployeeUNI (id INTEGER, unique_id INTEGER, PRIMARY KEY (id, unique_id));\nINSERT INTO Employees VALUES (1, 'Alice');\nINSERT INTO Employees VALUES (7, 'Bob');\nINSERT INTO Employees VALUES (11, 'Meir');\nINSERT INTO Employees VALUES (90, 'Winston');\nINSERT INTO Employees VALUES (3, 'Jonathan');\nINSERT INTO EmployeeUNI VALUES (3, 1);\nINSERT INTO EmployeeUNI VALUES (11, 2);\nINSERT INTO EmployeeUNI VALUES (90, 3);",
+    "lesson_syntax": "SELECT t2.col, t1.col FROM t1 LEFT JOIN t2 ON t1.id = t2.id;",
+    "test_cases": [
+      {
+        "expected_output": "unique_id|name\n|Alice\n|Bob\n2|Meir\n3|Winston\n1|Jonathan",
+        "is_hidden": false
+      }
+    ],
+    "category": "SQL",
+    "module_id": "2",
+    "module_name": "Multi-Table Queries",
+    "lesson_order": 5,
+    "id": 36
+  },
+  {
+    "leetcode_num": 1068,
+    "title": "Product Sales Analysis I",
+    "difficulty": "Easy",
+    "description": "## \ud83c\udfaf Product Sales Analysis I\n\nTable: **Sales**\n\n| Column Name | Type |\n|---|---|\n| sale_id | int |\n| product_id | int |\n| year | int |\n| quantity | int |\n| price | int |\n\n(sale_id, year) is the primary key.\n\nTable: **Product**\n\n| Column Name | Type |\n|---|---|\n| product_id | int (PK) |\n| product_name | varchar |\n\n---\n\n## \u270f\ufe0f Exercise\n\nReport the `product_name`, `year`, and `price` for each sale.\n\n**Example:**\n```\nInput:\nSales: [(1,100,2008,10,5000),(2,100,2009,12,5000),(7,200,2011,15,9000)]\nProduct: [(100,'Nokia'),(200,'Apple'),(300,'Samsung')]\n\nOutput:\n| product_name | year | price |\n|--------------|------|-------|\n| Nokia        | 2008 | 5000  |\n| Nokia        | 2009 | 5000  |\n| Apple        | 2011 | 9000  |\n```",
+    "initial_code": "-- Report product_name, year, and price for each sale\nSELECT ",
+    "solution_code": "SELECT p.product_name, s.year, s.price\nFROM Sales s\nJOIN Product p ON s.product_id = p.product_id;",
+    "context_sql": "CREATE TABLE Sales (sale_id INTEGER, product_id INTEGER, year INTEGER, quantity INTEGER, price INTEGER, PRIMARY KEY (sale_id, year));\nCREATE TABLE Product (product_id INTEGER PRIMARY KEY, product_name TEXT);\nINSERT INTO Sales VALUES (1, 100, 2008, 10, 5000);\nINSERT INTO Sales VALUES (2, 100, 2009, 12, 5000);\nINSERT INTO Sales VALUES (7, 200, 2011, 15, 9000);\nINSERT INTO Product VALUES (100, 'Nokia');\nINSERT INTO Product VALUES (200, 'Apple');\nINSERT INTO Product VALUES (300, 'Samsung');",
+    "lesson_syntax": "SELECT t1.col, t2.col FROM t1 JOIN t2 ON t1.fk = t2.pk;",
+    "test_cases": [
+      {
+        "expected_output": "product_name|year|price\nNokia|2008|5000\nNokia|2009|5000\nApple|2011|9000",
+        "is_hidden": false
+      }
+    ],
+    "category": "SQL",
+    "module_id": "2",
+    "module_name": "Multi-Table Queries",
+    "lesson_order": 6,
+    "id": 37
+  },
+  {
+    "leetcode_num": 1581,
+    "title": "Customer Who Visited but Did Not Make Any Transactions",
+    "difficulty": "Easy",
+    "description": "## \ud83c\udfaf Customer Who Visited but Did Not Make Any Transactions\n\nTable: **Visits**\n\n| Column Name | Type |\n|---|---|\n| visit_id | int (PK) |\n| customer_id | int |\n\nTable: **Transactions**\n\n| Column Name | Type |\n|---|---|\n| transaction_id | int (PK) |\n| visit_id | int |\n| amount | int |\n\n---\n\n## \u270f\ufe0f Exercise\n\nFind the IDs of users who visited without making any transactions and the number of times they made these types of visits.\n\n**Example:**\n```\nInput:\nVisits: [(1,23),(2,9),(4,30),(5,54),(6,96),(7,54),(8,54)]\nTransactions: [(2,5,310),(3,5,300),(9,5,200),(12,1,910),(13,2,970)]\n\nOutput:\n| customer_id | count_no_trans |\n|-------------|----------------|\n| 54          | 2              |\n| 30          | 1              |\n| 96          | 1              |\n```",
+    "initial_code": "-- Find customers who visited but had no transactions\nSELECT ",
+    "solution_code": "SELECT v.customer_id, COUNT(*) AS count_no_trans\nFROM Visits v\nLEFT JOIN Transactions t ON v.visit_id = t.visit_id\nWHERE t.transaction_id IS NULL\nGROUP BY v.customer_id;",
+    "context_sql": "CREATE TABLE Visits (visit_id INTEGER PRIMARY KEY, customer_id INTEGER);\nCREATE TABLE Transactions (transaction_id INTEGER PRIMARY KEY, visit_id INTEGER, amount INTEGER);\nINSERT INTO Visits VALUES (1, 23);\nINSERT INTO Visits VALUES (2, 9);\nINSERT INTO Visits VALUES (4, 30);\nINSERT INTO Visits VALUES (5, 54);\nINSERT INTO Visits VALUES (6, 96);\nINSERT INTO Visits VALUES (7, 54);\nINSERT INTO Visits VALUES (8, 54);\nINSERT INTO Transactions VALUES (2, 5, 310);\nINSERT INTO Transactions VALUES (3, 5, 300);\nINSERT INTO Transactions VALUES (9, 5, 200);\nINSERT INTO Transactions VALUES (12, 1, 910);\nINSERT INTO Transactions VALUES (13, 2, 970);",
+    "lesson_syntax": "SELECT col, COUNT(*) FROM t1 LEFT JOIN t2 ON ... WHERE t2.pk IS NULL GROUP BY col;",
+    "test_cases": [
+      {
+        "expected_output": "customer_id|count_no_trans\n54|2\n30|1\n96|1",
+        "is_hidden": false
+      }
+    ],
+    "category": "SQL",
+    "module_id": "2",
+    "module_name": "Multi-Table Queries",
+    "lesson_order": 7,
+    "id": 38
+  },
+  {
+    "leetcode_num": 197,
+    "title": "Rising Temperature",
+    "difficulty": "Easy",
+    "description": "## \ud83c\udfaf Rising Temperature\n\nTable: **Weather**\n\n| Column Name | Type |\n|---|---|\n| id | int (PK) |\n| recordDate | date |\n| temperature | int |\n\n---\n\n## \u270f\ufe0f Exercise\n\nFind all dates' `id` with higher temperatures compared to the previous day.\n\n**Example:**\n```\nInput:\n| id | recordDate | temperature |\n|----|------------|-------------|\n| 1  | 2015-01-01 | 10          |\n| 2  | 2015-01-02 | 25          |\n| 3  | 2015-01-03 | 20          |\n| 4  | 2015-01-04 | 30          |\n\nOutput:\n| id |\n|----|\n| 2  |\n| 4  |\n```",
+    "initial_code": "-- Find days with higher temp than yesterday\nSELECT ",
+    "solution_code": "SELECT w1.id\nFROM Weather w1\nJOIN Weather w2 ON DATE(w1.recordDate, '-1 day') = w2.recordDate\nWHERE w1.temperature > w2.temperature;",
+    "context_sql": "CREATE TABLE Weather (id INTEGER PRIMARY KEY, recordDate TEXT, temperature INTEGER);\nINSERT INTO Weather VALUES (1, '2015-01-01', 10);\nINSERT INTO Weather VALUES (2, '2015-01-02', 25);\nINSERT INTO Weather VALUES (3, '2015-01-03', 20);\nINSERT INTO Weather VALUES (4, '2015-01-04', 30);",
+    "lesson_syntax": "SELECT t1.col FROM t1 JOIN t1 AS t2 ON DATE(t1.date, '-1 day') = t2.date WHERE t1.val > t2.val;",
+    "test_cases": [
+      {
+        "expected_output": "id\n2\n4",
+        "is_hidden": false
+      }
+    ],
+    "category": "SQL",
+    "module_id": "8",
+    "module_name": "String & Date Functions",
+    "lesson_order": 6,
+    "id": 39
+  },
+  {
+    "leetcode_num": 1661,
+    "title": "Average Time of Process per Machine",
+    "difficulty": "Easy",
+    "description": "## \ud83c\udfaf Average Time of Process per Machine\n\nTable: **Activity**\n\n| Column Name | Type |\n|---|---|\n| machine_id | int |\n| process_id | int |\n| activity_type | enum('start','end') |\n| timestamp | float |\n\n(machine_id, process_id, activity_type) is PK.\n\n---\n\n## \u270f\ufe0f Exercise\n\nFind the average time each machine takes to complete a process. The time is the `end` timestamp minus the `start` timestamp. Round to 3 decimal places.\n\n**Example:**\n```\nInput:\n| machine_id | process_id | activity_type | timestamp |\n|------------|------------|---------------|-----------|\n| 0          | 0          | start         | 0.712     |\n| 0          | 0          | end           | 1.520     |\n| 0          | 1          | start         | 3.140     |\n| 0          | 1          | end           | 4.120     |\n| 1          | 0          | start         | 0.550     |\n| 1          | 0          | end           | 1.550     |\n| 1          | 1          | start         | 0.430     |\n| 1          | 1          | end           | 1.420     |\n| 2          | 0          | start         | 4.100     |\n| 2          | 0          | end           | 4.512     |\n| 2          | 1          | start         | 2.500     |\n| 2          | 1          | end           | 5.000     |\n\nOutput:\n| machine_id | processing_time |\n|------------|------------------|\n| 0          | 0.894            |\n| 1          | 0.995            |\n| 2          | 1.456            |\n```",
+    "initial_code": "-- Find average processing time per machine\nSELECT ",
+    "solution_code": "SELECT a1.machine_id,\n       ROUND(AVG(a2.timestamp - a1.timestamp), 3) AS processing_time\nFROM Activity a1\nJOIN Activity a2\n  ON a1.machine_id = a2.machine_id\n  AND a1.process_id = a2.process_id\n  AND a1.activity_type = 'start'\n  AND a2.activity_type = 'end'\nGROUP BY a1.machine_id;",
+    "context_sql": "CREATE TABLE Activity (machine_id INTEGER, process_id INTEGER, activity_type TEXT, timestamp REAL, PRIMARY KEY (machine_id, process_id, activity_type));\nINSERT INTO Activity VALUES (0, 0, 'start', 0.712);\nINSERT INTO Activity VALUES (0, 0, 'end', 1.520);\nINSERT INTO Activity VALUES (0, 1, 'start', 3.140);\nINSERT INTO Activity VALUES (0, 1, 'end', 4.120);\nINSERT INTO Activity VALUES (1, 0, 'start', 0.550);\nINSERT INTO Activity VALUES (1, 0, 'end', 1.550);\nINSERT INTO Activity VALUES (1, 1, 'start', 0.430);\nINSERT INTO Activity VALUES (1, 1, 'end', 1.420);\nINSERT INTO Activity VALUES (2, 0, 'start', 4.100);\nINSERT INTO Activity VALUES (2, 0, 'end', 4.512);\nINSERT INTO Activity VALUES (2, 1, 'start', 2.500);\nINSERT INTO Activity VALUES (2, 1, 'end', 5.000);",
+    "lesson_syntax": "SELECT col, ROUND(AVG(expr), n) AS alias FROM t1 JOIN t2 ON ... GROUP BY col;",
+    "test_cases": [
+      {
+        "expected_output": "machine_id|processing_time\n0|0.894\n1|0.995\n2|1.456",
+        "is_hidden": false
+      }
+    ],
+    "category": "SQL",
+    "module_id": "3",
+    "module_name": "Expressions & Aggregates",
+    "lesson_order": 6,
+    "id": 40
+  },
+  {
+    "leetcode_num": 577,
+    "title": "Employee Bonus",
+    "difficulty": "Easy",
+    "category": "SQL",
+    "description": "## \ud83c\udfaf Employee Bonus\n\nTable: **Employee** (empId PK, name, supervisor, salary)\nTable: **Bonus** (empId PK/FK, bonus)\n\n---\n\n## \u270f\ufe0f Exercise\n\nReport the name and bonus of each employee with a bonus **less than 1000**, or with **no bonus at all**.\n\n**Example:**\n```\nEmployee: [(3,'Brad',null,4000),(1,'John',3,1000),(2,'Dan',3,2000),(4,'Thomas',3,4000)]\nBonus: [(2,500),(4,2000)]\n\nOutput: Brad|null, John|null, Dan|500\n```",
+    "initial_code": "-- Employees with bonus < 1000 or no bonus\nSELECT ",
+    "solution_code": "SELECT e.name, b.bonus\nFROM Employee e\nLEFT JOIN Bonus b ON e.empId = b.empId\nWHERE b.bonus < 1000 OR b.bonus IS NULL;",
+    "context_sql": "CREATE TABLE Employee (empId INTEGER PRIMARY KEY, name TEXT, supervisor INTEGER, salary INTEGER);\nCREATE TABLE Bonus (empId INTEGER PRIMARY KEY, bonus INTEGER);\nINSERT INTO Employee VALUES (3,'Brad',NULL,4000);\nINSERT INTO Employee VALUES (1,'John',3,1000);\nINSERT INTO Employee VALUES (2,'Dan',3,2000);\nINSERT INTO Employee VALUES (4,'Thomas',3,4000);\nINSERT INTO Bonus VALUES (2,500);\nINSERT INTO Bonus VALUES (4,2000);",
+    "lesson_syntax": "LEFT JOIN; WHERE col < val OR col IS NULL;",
+    "test_cases": [
+      {
+        "expected_output": "name|bonus\nBrad|\nJohn|\nDan|500",
+        "is_hidden": false
+      }
+    ],
+    "module_id": "2",
+    "module_name": "Multi-Table Queries",
+    "lesson_order": 8,
+    "id": 41
+  },
+  {
+    "leetcode_num": 1280,
+    "title": "Students and Examinations",
+    "difficulty": "Easy",
+    "category": "SQL",
+    "description": "## \ud83c\udfaf Students and Examinations\n\nTable: **Students** (student_id PK, student_name)\nTable: **Subjects** (subject_name PK)\nTable: **Examinations** (student_id, subject_name) \u2014 no PK, may have duplicates\n\n---\n\n## \u270f\ufe0f Exercise\n\nFind the number of times each student attended each exam. Return all student-subject combinations, ordered by student_id and subject_name.",
+    "initial_code": "-- Count exams per student per subject\nSELECT ",
+    "solution_code": "SELECT s.student_id, s.student_name, sub.subject_name,\n       COUNT(e.student_id) AS attended_exams\nFROM Students s\nCROSS JOIN Subjects sub\nLEFT JOIN Examinations e\n  ON s.student_id = e.student_id AND sub.subject_name = e.subject_name\nGROUP BY s.student_id, s.student_name, sub.subject_name\nORDER BY s.student_id, sub.subject_name;",
+    "context_sql": "CREATE TABLE Students (student_id INTEGER PRIMARY KEY, student_name TEXT);\nCREATE TABLE Subjects (subject_name TEXT PRIMARY KEY);\nCREATE TABLE Examinations (student_id INTEGER, subject_name TEXT);\nINSERT INTO Students VALUES (1,'Alice');\nINSERT INTO Students VALUES (2,'Bob');\nINSERT INTO Students VALUES (13,'John');\nINSERT INTO Students VALUES (6,'Alex');\nINSERT INTO Subjects VALUES ('Math');\nINSERT INTO Subjects VALUES ('Physics');\nINSERT INTO Subjects VALUES ('Programming');\nINSERT INTO Examinations VALUES (1,'Math');\nINSERT INTO Examinations VALUES (1,'Physics');\nINSERT INTO Examinations VALUES (1,'Programming');\nINSERT INTO Examinations VALUES (2,'Programming');\nINSERT INTO Examinations VALUES (1,'Physics');\nINSERT INTO Examinations VALUES (1,'Math');\nINSERT INTO Examinations VALUES (13,'Math');\nINSERT INTO Examinations VALUES (13,'Programming');\nINSERT INTO Examinations VALUES (13,'Physics');\nINSERT INTO Examinations VALUES (2,'Math');\nINSERT INTO Examinations VALUES (1,'Math');",
+    "lesson_syntax": "CROSS JOIN; LEFT JOIN; COUNT(col) with GROUP BY; ORDER BY col1, col2;",
+    "test_cases": [
+      {
+        "expected_output": "student_id|student_name|subject_name|attended_exams\n1|Alice|Math|3\n1|Alice|Physics|2\n1|Alice|Programming|1\n2|Bob|Math|1\n2|Bob|Physics|0\n2|Bob|Programming|1\n6|Alex|Math|0\n6|Alex|Physics|0\n6|Alex|Programming|0\n13|John|Math|1\n13|John|Physics|1\n13|John|Programming|1",
+        "is_hidden": false
+      }
+    ],
+    "module_id": "2",
+    "module_name": "Multi-Table Queries",
+    "lesson_order": 9,
+    "id": 42
+  },
+  {
+    "leetcode_num": 570,
+    "title": "Managers with at Least 5 Direct Reports",
+    "difficulty": "Medium",
+    "category": "SQL",
+    "description": "## \ud83c\udfaf Managers with at Least 5 Direct Reports\n\nTable: **Employee** (id PK, name, department, managerId)\n\n## \u270f\ufe0f Exercise\n\nFind managers with at least **5 direct reports**.",
+    "initial_code": "-- Find managers with >= 5 direct reports\nSELECT ",
+    "solution_code": "SELECT e.name\nFROM Employee e\nJOIN Employee m ON e.id = m.managerId\nGROUP BY e.id, e.name\nHAVING COUNT(*) >= 5;",
+    "context_sql": "CREATE TABLE Employee (id INTEGER PRIMARY KEY, name TEXT, department TEXT, managerId INTEGER);\nINSERT INTO Employee VALUES (101,'John','A',NULL);\nINSERT INTO Employee VALUES (102,'Dan','A',101);\nINSERT INTO Employee VALUES (103,'James','A',101);\nINSERT INTO Employee VALUES (104,'Amy','A',101);\nINSERT INTO Employee VALUES (105,'Anne','A',101);\nINSERT INTO Employee VALUES (106,'Ron','B',101);",
+    "lesson_syntax": "SELECT col FROM t1 JOIN t2 ON ... GROUP BY col HAVING COUNT(*) >= n;",
+    "test_cases": [
+      {
+        "expected_output": "name\nJohn",
+        "is_hidden": false
+      }
+    ],
+    "module_id": "9",
+    "module_name": "Self-JOINs & Advanced Patterns",
+    "lesson_order": 3,
+    "id": 43
+  },
+  {
+    "leetcode_num": 1934,
+    "title": "Confirmation Rate",
+    "difficulty": "Medium",
+    "category": "SQL",
+    "description": "## \ud83c\udfaf Confirmation Rate\n\nTable: **Signups** (user_id PK, time_stamp)\nTable: **Confirmations** (user_id, time_stamp, action enum('confirmed','timeout'))\n\n## \u270f\ufe0f Exercise\n\nFind the confirmation rate of each user. Rate = confirmed / total messages. Round to 2 decimals. If no messages, rate is 0.",
+    "initial_code": "-- Find confirmation rate per user\nSELECT ",
+    "solution_code": "SELECT s.user_id,\n       ROUND(COALESCE(SUM(CASE WHEN c.action = 'confirmed' THEN 1 ELSE 0 END) * 1.0 / NULLIF(COUNT(c.action), 0), 0), 2) AS confirmation_rate\nFROM Signups s\nLEFT JOIN Confirmations c ON s.user_id = c.user_id\nGROUP BY s.user_id;",
+    "context_sql": "CREATE TABLE Signups (user_id INTEGER PRIMARY KEY, time_stamp TEXT);\nCREATE TABLE Confirmations (user_id INTEGER, time_stamp TEXT, action TEXT);\nINSERT INTO Signups VALUES (3,'2020-03-21 10:16:13');\nINSERT INTO Signups VALUES (7,'2020-01-04 13:57:59');\nINSERT INTO Signups VALUES (2,'2020-07-29 23:09:44');\nINSERT INTO Signups VALUES (6,'2020-12-09 10:39:37');\nINSERT INTO Confirmations VALUES (3,'2021-01-06 03:30:46','timeout');\nINSERT INTO Confirmations VALUES (3,'2021-07-14 14:00:00','timeout');\nINSERT INTO Confirmations VALUES (7,'2021-06-12 11:57:29','confirmed');\nINSERT INTO Confirmations VALUES (7,'2021-06-13 12:58:28','confirmed');\nINSERT INTO Confirmations VALUES (7,'2021-06-14 13:59:27','confirmed');\nINSERT INTO Confirmations VALUES (2,'2021-01-22 00:00:00','confirmed');\nINSERT INTO Confirmations VALUES (2,'2021-02-28 23:59:59','timeout');",
+    "lesson_syntax": "CASE WHEN ... THEN ... ELSE ... END; ROUND(); COALESCE(); NULLIF();",
+    "test_cases": [
+      {
+        "expected_output": "user_id|confirmation_rate\n2|0.5\n3|0.0\n6|0.0\n7|1.0",
+        "is_hidden": false
+      }
+    ],
+    "module_id": "7",
+    "module_name": "Conditional Logic & CASE",
+    "lesson_order": 3,
+    "id": 44
+  },
+  {
+    "leetcode_num": 620,
+    "title": "Not Boring Movies",
+    "difficulty": "Easy",
+    "category": "SQL",
+    "description": "## \ud83c\udfaf Not Boring Movies\n\nTable: **Cinema** (id PK, movie, description, rating)\n\n## \u270f\ufe0f Exercise\n\nReport movies with an **odd-numbered** ID and a description that is **not** 'boring'. Order by rating descending.",
+    "initial_code": "-- Find non-boring movies with odd IDs\nSELECT ",
+    "solution_code": "SELECT *\nFROM Cinema\nWHERE id % 2 = 1 AND description != 'boring'\nORDER BY rating DESC;",
+    "context_sql": "CREATE TABLE Cinema (id INTEGER PRIMARY KEY, movie TEXT, description TEXT, rating REAL);\nINSERT INTO Cinema VALUES (1,'War','great 3D',8.9);\nINSERT INTO Cinema VALUES (2,'Science','fiction',8.5);\nINSERT INTO Cinema VALUES (3,'irish','boring',6.2);\nINSERT INTO Cinema VALUES (4,'Ice song','fantasy',8.6);\nINSERT INTO Cinema VALUES (5,'House card','interesting',9.1);",
+    "lesson_syntax": "WHERE col % 2 = 1 AND col != 'val' ORDER BY col DESC;",
+    "test_cases": [
+      {
+        "expected_output": "id|movie|description|rating\n5|House card|interesting|9.1\n1|War|great 3D|8.9",
+        "is_hidden": false
+      }
+    ],
+    "module_id": "1",
+    "module_name": "Introduction to Queries",
+    "lesson_order": 11,
+    "id": 45
+  },
+  {
+    "leetcode_num": 1251,
+    "title": "Average Selling Price",
+    "difficulty": "Easy",
+    "category": "SQL",
+    "description": "## \ud83c\udfaf Average Selling Price\n\nTable: **Prices** (product_id, start_date, end_date, price)\nTable: **UnitsSold** (product_id, purchase_date, units)\n\n## \u270f\ufe0f Exercise\n\nFind the average selling price for each product. Round to 2 decimal places. If no units sold, average price is 0.",
+    "initial_code": "-- Find average selling price per product\nSELECT ",
+    "solution_code": "SELECT p.product_id,\n       COALESCE(ROUND(SUM(p.price * u.units) * 1.0 / SUM(u.units), 2), 0) AS average_price\nFROM Prices p\nLEFT JOIN UnitsSold u\n  ON p.product_id = u.product_id\n  AND u.purchase_date BETWEEN p.start_date AND p.end_date\nGROUP BY p.product_id;",
+    "context_sql": "CREATE TABLE Prices (product_id INTEGER, start_date TEXT, end_date TEXT, price INTEGER, PRIMARY KEY (product_id, start_date, end_date));\nCREATE TABLE UnitsSold (product_id INTEGER, purchase_date TEXT, units INTEGER);\nINSERT INTO Prices VALUES (1,'2019-02-17','2019-02-28',5);\nINSERT INTO Prices VALUES (1,'2019-03-01','2019-03-22',20);\nINSERT INTO Prices VALUES (2,'2019-02-01','2019-02-20',15);\nINSERT INTO Prices VALUES (2,'2019-02-21','2019-03-31',30);\nINSERT INTO UnitsSold VALUES (1,'2019-02-25',100);\nINSERT INTO UnitsSold VALUES (1,'2019-03-01',15);\nINSERT INTO UnitsSold VALUES (2,'2019-02-10',200);\nINSERT INTO UnitsSold VALUES (2,'2019-03-22',30);",
+    "lesson_syntax": "LEFT JOIN with BETWEEN; SUM(); ROUND(); COALESCE();",
+    "test_cases": [
+      {
+        "expected_output": "product_id|average_price\n1|6.96\n2|16.96",
+        "is_hidden": false
+      }
+    ],
+    "module_id": "10",
+    "module_name": "Real-World Query Challenges",
+    "lesson_order": 2,
+    "id": 46
+  },
+  {
+    "leetcode_num": 1075,
+    "title": "Project Employees I",
+    "difficulty": "Easy",
+    "category": "SQL",
+    "description": "## \ud83c\udfaf Project Employees I\n\nTable: **Project** (project_id, employee_id) \u2014 composite PK\nTable: **Employee** (employee_id PK, name, experience_years)\n\n## \u270f\ufe0f Exercise\n\nReport the **average experience years** of all employees for each project, rounded to 2 digits.",
+    "initial_code": "-- Average experience years per project\nSELECT ",
+    "solution_code": "SELECT p.project_id,\n       ROUND(AVG(e.experience_years), 2) AS average_years\nFROM Project p\nJOIN Employee e ON p.employee_id = e.employee_id\nGROUP BY p.project_id;",
+    "context_sql": "CREATE TABLE Project (project_id INTEGER, employee_id INTEGER, PRIMARY KEY (project_id, employee_id));\nCREATE TABLE Employee2 (employee_id INTEGER PRIMARY KEY, name TEXT, experience_years INTEGER);\nALTER TABLE Employee2 RENAME TO Employee;\nDROP TABLE IF EXISTS Employee;\nCREATE TABLE Employee (employee_id INTEGER PRIMARY KEY, name TEXT, experience_years INTEGER);\nINSERT INTO Project VALUES (1,1);\nINSERT INTO Project VALUES (1,2);\nINSERT INTO Project VALUES (1,3);\nINSERT INTO Project VALUES (2,1);\nINSERT INTO Project VALUES (2,4);\nINSERT INTO Employee VALUES (1,'Khaled',3);\nINSERT INTO Employee VALUES (2,'Ali',2);\nINSERT INTO Employee VALUES (3,'John',1);\nINSERT INTO Employee VALUES (4,'Doe',2);",
+    "lesson_syntax": "SELECT col, ROUND(AVG(col), 2) FROM t1 JOIN t2 ON ... GROUP BY col;",
+    "test_cases": [
+      {
+        "expected_output": "project_id|average_years\n1|2.0\n2|2.5",
+        "is_hidden": false
+      }
+    ],
+    "module_id": "3",
+    "module_name": "Expressions & Aggregates",
+    "lesson_order": 7,
+    "id": 47
+  },
+  {
+    "leetcode_num": 1633,
+    "title": "Percentage of Users Attended a Contest",
+    "difficulty": "Easy",
+    "category": "SQL",
+    "description": "## \ud83c\udfaf Percentage of Users Attended a Contest\n\nTable: **Users** (user_id PK, user_name)\nTable: **Register** (contest_id, user_id) \u2014 composite PK\n\n## \u270f\ufe0f Exercise\n\nFind the percentage of users registered in each contest, rounded to 2 decimal places. Order by percentage DESC, then contest_id ASC.",
+    "initial_code": "-- Percentage of users per contest\nSELECT ",
+    "solution_code": "SELECT r.contest_id,\n       ROUND(COUNT(r.user_id) * 100.0 / (SELECT COUNT(*) FROM Users), 2) AS percentage\nFROM Register r\nGROUP BY r.contest_id\nORDER BY percentage DESC, r.contest_id ASC;",
+    "context_sql": "CREATE TABLE Users (user_id INTEGER PRIMARY KEY, user_name TEXT);\nCREATE TABLE Register (contest_id INTEGER, user_id INTEGER, PRIMARY KEY (contest_id, user_id));\nINSERT INTO Users VALUES (6,'Alice');\nINSERT INTO Users VALUES (2,'Bob');\nINSERT INTO Users VALUES (7,'Alex');\nINSERT INTO Register VALUES (215,6);\nINSERT INTO Register VALUES (209,2);\nINSERT INTO Register VALUES (208,2);\nINSERT INTO Register VALUES (210,6);\nINSERT INTO Register VALUES (208,6);\nINSERT INTO Register VALUES (209,7);\nINSERT INTO Register VALUES (209,6);\nINSERT INTO Register VALUES (215,7);\nINSERT INTO Register VALUES (208,7);\nINSERT INTO Register VALUES (210,2);\nINSERT INTO Register VALUES (207,2);\nINSERT INTO Register VALUES (210,7);",
+    "lesson_syntax": "COUNT() * 100.0 / (SELECT COUNT(*) FROM table); subquery in SELECT;",
+    "test_cases": [
+      {
+        "expected_output": "contest_id|percentage\n208|100.0\n209|100.0\n210|100.0\n215|66.67\n207|33.33",
+        "is_hidden": false
+      }
+    ],
+    "module_id": "3",
+    "module_name": "Expressions & Aggregates",
+    "lesson_order": 8,
+    "id": 48
+  },
+  {
+    "leetcode_num": 1211,
+    "title": "Queries Quality and Percentage",
+    "difficulty": "Easy",
+    "category": "SQL",
+    "description": "## \ud83c\udfaf Queries Quality and Percentage\n\nTable: **Queries** (query_name, result, position, rating)\n\n## \u270f\ufe0f Exercise\n\nFind each query_name's quality (avg of rating/position, rounded to 2) and poor_query_percentage (% of queries with rating < 3, rounded to 2).",
+    "initial_code": "-- Quality and poor query percentage\nSELECT ",
+    "solution_code": "SELECT query_name,\n       ROUND(AVG(rating * 1.0 / position), 2) AS quality,\n       ROUND(SUM(CASE WHEN rating < 3 THEN 1 ELSE 0 END) * 100.0 / COUNT(*), 2) AS poor_query_percentage\nFROM Queries\nWHERE query_name IS NOT NULL\nGROUP BY query_name;",
+    "context_sql": "CREATE TABLE Queries (query_name TEXT, result TEXT, position INTEGER, rating INTEGER);\nINSERT INTO Queries VALUES ('Dog','Golden Retriever',1,5);\nINSERT INTO Queries VALUES ('Dog','German Shepherd',2,5);\nINSERT INTO Queries VALUES ('Dog','Meli',200,1);\nINSERT INTO Queries VALUES ('Cat','Everglow',1,5);\nINSERT INTO Queries VALUES ('Cat','Original',2,4);",
+    "lesson_syntax": "AVG(col1 * 1.0 / col2); SUM(CASE WHEN ... END) * 100.0 / COUNT(*);",
+    "test_cases": [
+      {
+        "expected_output": "query_name|quality|poor_query_percentage\nCat|2.5|0.0\nDog|2.52|33.33",
+        "is_hidden": false
+      }
+    ],
+    "module_id": "7",
+    "module_name": "Conditional Logic & CASE",
+    "lesson_order": 4,
+    "id": 49
+  },
+  {
+    "leetcode_num": 1193,
+    "title": "Monthly Transactions I",
+    "difficulty": "Medium",
+    "category": "SQL",
+    "description": "## \ud83c\udfaf Monthly Transactions I\n\nTable: **Transactions** (id PK, country, state enum('approved','declined'), amount, trans_date)\n\n## \u270f\ufe0f Exercise\n\nFor each month and country, find: total transactions, approved count, total amount, approved amount.",
+    "initial_code": "-- Monthly transaction summary by country\nSELECT ",
+    "solution_code": "SELECT SUBSTR(trans_date, 1, 7) AS month,\n       country,\n       COUNT(*) AS trans_count,\n       SUM(CASE WHEN state = 'approved' THEN 1 ELSE 0 END) AS approved_count,\n       SUM(amount) AS trans_total_amount,\n       SUM(CASE WHEN state = 'approved' THEN amount ELSE 0 END) AS approved_total_amount\nFROM Transactions\nGROUP BY SUBSTR(trans_date, 1, 7), country;",
+    "context_sql": "CREATE TABLE Transactions (id INTEGER PRIMARY KEY, country TEXT, state TEXT, amount INTEGER, trans_date TEXT);\nINSERT INTO Transactions VALUES (121,'US','approved',1000,'2018-12-18');\nINSERT INTO Transactions VALUES (122,'US','declined',2000,'2018-12-19');\nINSERT INTO Transactions VALUES (123,'US','approved',2000,'2019-01-01');\nINSERT INTO Transactions VALUES (124,'DE','approved',2000,'2019-01-07');",
+    "lesson_syntax": "SUBSTR(date, 1, 7) for month; SUM(CASE WHEN ... END); GROUP BY expr;",
+    "test_cases": [
+      {
+        "expected_output": "month|country|trans_count|approved_count|trans_total_amount|approved_total_amount\n2018-12|US|2|1|3000|1000\n2019-01|DE|1|1|2000|2000\n2019-01|US|1|1|2000|2000",
+        "is_hidden": false
+      }
+    ],
+    "module_id": "7",
+    "module_name": "Conditional Logic & CASE",
+    "lesson_order": 5,
+    "id": 50
+  },
+  {
+    "leetcode_num": 1174,
+    "title": "Immediate Food Delivery II",
+    "difficulty": "Medium",
+    "category": "SQL",
+    "description": "## \ud83c\udfaf Immediate Food Delivery II\n\nTable: **Delivery** (delivery_id PK, customer_id, order_date, customer_pref_delivery_date)\n\nThe first order is the one with the earliest order_date. An order is 'immediate' if order_date = customer_pref_delivery_date.\n\n## \u270f\ufe0f Exercise\n\nFind the percentage of immediate orders among first orders, rounded to 2 decimal places.",
+    "initial_code": "-- Immediate delivery percentage for first orders\nSELECT ",
+    "solution_code": "SELECT ROUND(\n  SUM(CASE WHEN d.order_date = d.customer_pref_delivery_date THEN 1 ELSE 0 END) * 100.0 / COUNT(*), 2\n) AS immediate_percentage\nFROM Delivery d\nJOIN (\n  SELECT customer_id, MIN(order_date) AS first_order\n  FROM Delivery\n  GROUP BY customer_id\n) f ON d.customer_id = f.customer_id AND d.order_date = f.first_order;",
+    "context_sql": "CREATE TABLE Delivery (delivery_id INTEGER PRIMARY KEY, customer_id INTEGER, order_date TEXT, customer_pref_delivery_date TEXT);\nINSERT INTO Delivery VALUES (1,1,'2019-08-01','2019-08-02');\nINSERT INTO Delivery VALUES (2,2,'2019-08-02','2019-08-02');\nINSERT INTO Delivery VALUES (3,1,'2019-08-11','2019-08-12');\nINSERT INTO Delivery VALUES (4,3,'2019-08-24','2019-08-24');\nINSERT INTO Delivery VALUES (5,3,'2019-08-21','2019-08-22');\nINSERT INTO Delivery VALUES (6,2,'2019-08-11','2019-08-13');\nINSERT INTO Delivery VALUES (7,4,'2019-08-09','2019-08-09');",
+    "lesson_syntax": "Subquery with MIN(); JOIN on subquery; SUM(CASE...) / COUNT(*);",
+    "test_cases": [
+      {
+        "expected_output": "immediate_percentage\n50.0",
+        "is_hidden": false
+      }
+    ],
+    "module_id": "10",
+    "module_name": "Real-World Query Challenges",
+    "lesson_order": 3,
+    "id": 51
+  },
+  {
+    "leetcode_num": 550,
+    "title": "Game Play Analysis IV",
+    "difficulty": "Medium",
+    "category": "SQL",
+    "description": "## \ud83c\udfaf Game Play Analysis IV\n\nTable: **Activity** (player_id, device_id, event_date, games_played). PK: (player_id, event_date).\n\n## \u270f\ufe0f Exercise\n\nReport the fraction of players that logged in again on the day after their first login, rounded to 2 decimal places.",
+    "initial_code": "-- Fraction of players who logged in day after first login\nSELECT ",
+    "solution_code": "SELECT ROUND(\n  COUNT(DISTINCT a.player_id) * 1.0 / (SELECT COUNT(DISTINCT player_id) FROM Activity), 2\n) AS fraction\nFROM Activity a\nJOIN (\n  SELECT player_id, MIN(event_date) AS first_login\n  FROM Activity\n  GROUP BY player_id\n) f ON a.player_id = f.player_id\nWHERE DATE(a.event_date) = DATE(f.first_login, '+1 day')\n  AND a.event_date != f.first_login;",
+    "context_sql": "CREATE TABLE Activity (player_id INTEGER, device_id INTEGER, event_date TEXT, games_played INTEGER, PRIMARY KEY (player_id, event_date));\nINSERT INTO Activity VALUES (1,2,'2016-03-01',5);\nINSERT INTO Activity VALUES (1,2,'2016-03-02',6);\nINSERT INTO Activity VALUES (2,3,'2017-06-25',1);\nINSERT INTO Activity VALUES (3,1,'2016-03-02',0);\nINSERT INTO Activity VALUES (3,4,'2018-07-03',5);",
+    "lesson_syntax": "MIN() for first occurrence; DATE(col, '+1 day') for date arithmetic; Subquery JOIN;",
+    "test_cases": [
+      {
+        "expected_output": "fraction\n0.33",
+        "is_hidden": false
+      }
+    ],
+    "module_id": "10",
+    "module_name": "Real-World Query Challenges",
+    "lesson_order": 4,
+    "id": 52
+  },
+  {
+    "leetcode_num": 2356,
+    "title": "Number of Unique Subjects Taught by Each Teacher",
+    "difficulty": "Easy",
+    "category": "SQL",
+    "description": "## \ud83c\udfaf Number of Unique Subjects Taught by Each Teacher\n\nTable: **Teacher** (teacher_id, subject_id, dept_id). PK: (subject_id, dept_id).\n\n## \u270f\ufe0f Exercise\n\nCalculate the number of **unique subjects** each teacher teaches.",
+    "initial_code": "-- Count unique subjects per teacher\nSELECT ",
+    "solution_code": "SELECT teacher_id, COUNT(DISTINCT subject_id) AS cnt\nFROM Teacher\nGROUP BY teacher_id;",
+    "context_sql": "CREATE TABLE Teacher (teacher_id INTEGER, subject_id INTEGER, dept_id INTEGER, PRIMARY KEY (subject_id, dept_id));\nINSERT INTO Teacher VALUES (1,2,3);\nINSERT INTO Teacher VALUES (1,2,4);\nINSERT INTO Teacher VALUES (1,3,3);\nINSERT INTO Teacher VALUES (2,1,1);\nINSERT INTO Teacher VALUES (2,2,1);\nINSERT INTO Teacher VALUES (2,3,1);\nINSERT INTO Teacher VALUES (2,4,1);",
+    "lesson_syntax": "SELECT col, COUNT(DISTINCT col2) FROM table GROUP BY col;",
+    "test_cases": [
+      {
+        "expected_output": "teacher_id|cnt\n1|2\n2|4",
+        "is_hidden": false
+      }
+    ],
+    "module_id": "3",
+    "module_name": "Expressions & Aggregates",
+    "lesson_order": 9,
+    "id": 53
+  },
+  {
+    "leetcode_num": 1141,
+    "title": "User Activity for the Past 30 Days I",
+    "difficulty": "Easy",
+    "category": "SQL",
+    "description": "## \ud83c\udfaf User Activity for the Past 30 Days I\n\nTable: **Activity** (user_id, session_id, activity_date, activity_type)\n\n## \u270f\ufe0f Exercise\n\nFind the daily active user count for the 30-day period ending 2019-07-27 (inclusive). An active user on a given day made at least one activity that day.",
+    "initial_code": "-- Daily active users in 30-day window\nSELECT ",
+    "solution_code": "SELECT activity_date AS day, COUNT(DISTINCT user_id) AS active_users\nFROM Activity\nWHERE activity_date BETWEEN DATE('2019-07-27', '-29 days') AND '2019-07-27'\nGROUP BY activity_date;",
+    "context_sql": "CREATE TABLE Activity (user_id INTEGER, session_id INTEGER, activity_date TEXT, activity_type TEXT);\nINSERT INTO Activity VALUES (1,1,'2019-07-20','open_session');\nINSERT INTO Activity VALUES (1,1,'2019-07-20','scroll_down');\nINSERT INTO Activity VALUES (1,1,'2019-07-20','end_session');\nINSERT INTO Activity VALUES (2,4,'2019-07-20','open_session');\nINSERT INTO Activity VALUES (2,4,'2019-07-21','send_message');\nINSERT INTO Activity VALUES (2,4,'2019-07-21','end_session');\nINSERT INTO Activity VALUES (3,2,'2019-07-21','open_session');\nINSERT INTO Activity VALUES (3,2,'2019-07-21','send_message');\nINSERT INTO Activity VALUES (3,2,'2019-07-21','end_session');\nINSERT INTO Activity VALUES (4,3,'2019-06-25','open_session');",
+    "lesson_syntax": "DATE(col, '-N days'); BETWEEN; COUNT(DISTINCT col); GROUP BY col;",
+    "test_cases": [
+      {
+        "expected_output": "day|active_users\n2019-07-20|2\n2019-07-21|2",
+        "is_hidden": false
+      }
+    ],
+    "module_id": "8",
+    "module_name": "String & Date Functions",
+    "lesson_order": 7,
+    "id": 54
+  },
+  {
+    "leetcode_num": 1070,
+    "title": "Product Sales Analysis III",
+    "difficulty": "Medium",
+    "category": "SQL",
+    "description": "## \ud83c\udfaf Product Sales Analysis III\n\nTable: **Sales** (sale_id, product_id, year, quantity, price). PK: (sale_id, year).\n\n## \u270f\ufe0f Exercise\n\nSelect the product_id, first_year, quantity, and price for the **first year** each product was sold.",
+    "initial_code": "-- First year sales for each product\nSELECT ",
+    "solution_code": "SELECT s.product_id, s.year AS first_year, s.quantity, s.price\nFROM Sales s\nJOIN (\n  SELECT product_id, MIN(year) AS min_year\n  FROM Sales\n  GROUP BY product_id\n) f ON s.product_id = f.product_id AND s.year = f.min_year;",
+    "context_sql": "CREATE TABLE Sales (sale_id INTEGER, product_id INTEGER, year INTEGER, quantity INTEGER, price INTEGER, PRIMARY KEY (sale_id, year));\nINSERT INTO Sales VALUES (1,100,2008,10,5000);\nINSERT INTO Sales VALUES (2,100,2009,12,5000);\nINSERT INTO Sales VALUES (7,200,2011,15,9000);",
+    "lesson_syntax": "Subquery with MIN(); JOIN subquery to filter first occurrence;",
+    "test_cases": [
+      {
+        "expected_output": "product_id|first_year|quantity|price\n100|2008|10|5000\n200|2011|15|9000",
+        "is_hidden": false
+      }
+    ],
+    "module_id": "10",
+    "module_name": "Real-World Query Challenges",
+    "lesson_order": 5,
+    "id": 55
+  },
+  {
+    "leetcode_num": 596,
+    "title": "Classes With at Least 5 Students",
+    "difficulty": "Easy",
+    "category": "SQL",
+    "description": "## \ud83c\udfaf Classes With at Least 5 Students\n\nTable: **Courses** (student, class) \u2014 composite PK\n\n## \u270f\ufe0f Exercise\n\nFind all classes that have **at least 5 students**.",
+    "initial_code": "-- Find classes with >= 5 students\nSELECT ",
+    "solution_code": "SELECT class\nFROM Courses\nGROUP BY class\nHAVING COUNT(student) >= 5;",
+    "context_sql": "CREATE TABLE Courses (student TEXT, class TEXT, PRIMARY KEY (student, class));\nINSERT INTO Courses VALUES ('A','Math');\nINSERT INTO Courses VALUES ('B','English');\nINSERT INTO Courses VALUES ('C','Math');\nINSERT INTO Courses VALUES ('D','Biology');\nINSERT INTO Courses VALUES ('E','Math');\nINSERT INTO Courses VALUES ('F','Computer');\nINSERT INTO Courses VALUES ('G','Math');\nINSERT INTO Courses VALUES ('H','Math');\nINSERT INTO Courses VALUES ('I','Math');",
+    "lesson_syntax": "GROUP BY col HAVING COUNT(col) >= n;",
+    "test_cases": [
+      {
+        "expected_output": "class\nMath",
+        "is_hidden": false
+      }
+    ],
+    "module_id": "3",
+    "module_name": "Expressions & Aggregates",
+    "lesson_order": 10,
+    "id": 56
+  },
+  {
+    "leetcode_num": 1729,
+    "title": "Find Followers Count",
+    "difficulty": "Easy",
+    "category": "SQL",
+    "description": "## \ud83c\udfaf Find Followers Count\n\nTable: **Followers** (user_id, follower_id) \u2014 composite PK\n\n## \u270f\ufe0f Exercise\n\nFor each user, return the number of followers. Order by user_id ASC.",
+    "initial_code": "-- Count followers per user\nSELECT ",
+    "solution_code": "SELECT user_id, COUNT(follower_id) AS followers_count\nFROM Followers\nGROUP BY user_id\nORDER BY user_id;",
+    "context_sql": "CREATE TABLE Followers (user_id INTEGER, follower_id INTEGER, PRIMARY KEY (user_id, follower_id));\nINSERT INTO Followers VALUES (0,1);\nINSERT INTO Followers VALUES (1,0);\nINSERT INTO Followers VALUES (2,0);\nINSERT INTO Followers VALUES (2,1);",
+    "lesson_syntax": "GROUP BY col ORDER BY col;",
+    "test_cases": [
+      {
+        "expected_output": "user_id|followers_count\n0|1\n1|1\n2|2",
+        "is_hidden": false
+      }
+    ],
+    "module_id": "3",
+    "module_name": "Expressions & Aggregates",
+    "lesson_order": 11,
+    "id": 57
+  },
+  {
+    "leetcode_num": 619,
+    "title": "Biggest Single Number",
+    "difficulty": "Easy",
+    "category": "SQL",
+    "description": "## \ud83c\udfaf Biggest Single Number\n\nTable: **MyNumbers** (num) \u2014 no PK, may contain duplicates\n\nA single number is one that appeared only once.\n\n## \u270f\ufe0f Exercise\n\nFind the largest single number. If none, return null.",
+    "initial_code": "-- Find largest number that appears exactly once\nSELECT ",
+    "solution_code": "SELECT MAX(num) AS num\nFROM (\n  SELECT num\n  FROM MyNumbers\n  GROUP BY num\n  HAVING COUNT(*) = 1\n);",
+    "context_sql": "CREATE TABLE MyNumbers (num INTEGER);\nINSERT INTO MyNumbers VALUES (8);\nINSERT INTO MyNumbers VALUES (8);\nINSERT INTO MyNumbers VALUES (3);\nINSERT INTO MyNumbers VALUES (3);\nINSERT INTO MyNumbers VALUES (1);\nINSERT INTO MyNumbers VALUES (4);\nINSERT INTO MyNumbers VALUES (5);\nINSERT INTO MyNumbers VALUES (6);",
+    "lesson_syntax": "MAX(col) from subquery; GROUP BY HAVING COUNT(*) = 1;",
+    "test_cases": [
+      {
+        "expected_output": "num\n6",
+        "is_hidden": false
+      }
+    ],
+    "module_id": "3",
+    "module_name": "Expressions & Aggregates",
+    "lesson_order": 12,
+    "id": 58
+  },
+  {
+    "leetcode_num": 1045,
+    "title": "Customers Who Bought All Products",
+    "difficulty": "Medium",
+    "category": "SQL",
+    "description": "## \ud83c\udfaf Customers Who Bought All Products\n\nTable: **Customer** (customer_id, product_key FK)\nTable: **Product** (product_key PK)\n\n## \u270f\ufe0f Exercise\n\nReport customers who bought **all** products in the Product table.",
+    "initial_code": "-- Find customers who bought every product\nSELECT ",
+    "solution_code": "SELECT customer_id\nFROM Customer\nGROUP BY customer_id\nHAVING COUNT(DISTINCT product_key) = (SELECT COUNT(*) FROM Product);",
+    "context_sql": "CREATE TABLE Customer (customer_id INTEGER, product_key INTEGER);\nCREATE TABLE Product (product_key INTEGER PRIMARY KEY);\nINSERT INTO Customer VALUES (1,5);\nINSERT INTO Customer VALUES (2,6);\nINSERT INTO Customer VALUES (3,5);\nINSERT INTO Customer VALUES (3,6);\nINSERT INTO Customer VALUES (1,6);\nINSERT INTO Product VALUES (5);\nINSERT INTO Product VALUES (6);",
+    "lesson_syntax": "HAVING COUNT(DISTINCT col) = (SELECT COUNT(*) FROM table);",
+    "test_cases": [
+      {
+        "expected_output": "customer_id\n1\n3",
+        "is_hidden": false
+      }
+    ],
+    "module_id": "6",
+    "module_name": "Advanced Queries",
+    "lesson_order": 5,
+    "id": 59
+  },
+  {
+    "leetcode_num": 1731,
+    "title": "The Number of Employees Which Report to Each Employee",
+    "difficulty": "Easy",
+    "category": "SQL",
+    "description": "## \ud83c\udfaf The Number of Employees Which Report to Each Employee\n\nTable: **Employees** (employee_id PK, name, reports_to, age)\n\n## \u270f\ufe0f Exercise\n\nFor each manager (has >= 1 report), find their reports_count and average_age of reports (rounded to nearest integer). Order by employee_id.",
+    "initial_code": "-- Find managers with report counts and avg age\nSELECT ",
+    "solution_code": "SELECT m.employee_id, m.name,\n       COUNT(e.employee_id) AS reports_count,\n       ROUND(AVG(e.age)) AS average_age\nFROM Employees m\nJOIN Employees e ON m.employee_id = e.reports_to\nGROUP BY m.employee_id, m.name\nORDER BY m.employee_id;",
+    "context_sql": "CREATE TABLE Employees (employee_id INTEGER PRIMARY KEY, name TEXT, reports_to INTEGER, age INTEGER);\nINSERT INTO Employees VALUES (9,'Hercy',NULL,43);\nINSERT INTO Employees VALUES (6,'Alice',9,41);\nINSERT INTO Employees VALUES (4,'Bob',9,36);\nINSERT INTO Employees VALUES (2,'Winston',NULL,37);",
+    "lesson_syntax": "Self-JOIN; COUNT(); ROUND(AVG()); ORDER BY col;",
+    "test_cases": [
+      {
+        "expected_output": "employee_id|name|reports_count|average_age\n9|Hercy|2|39",
+        "is_hidden": false
+      }
+    ],
+    "module_id": "9",
+    "module_name": "Self-JOINs & Advanced Patterns",
+    "lesson_order": 4,
+    "id": 60
+  },
+  {
+    "leetcode_num": 1789,
+    "title": "Primary Department for Each Employee",
+    "difficulty": "Easy",
+    "category": "SQL",
+    "description": "## \ud83c\udfaf Primary Department for Each Employee\n\nTable: **Employee** (employee_id, department_id, primary_flag enum('Y','N')). PK: (employee_id, department_id).\n\n## \u270f\ufe0f Exercise\n\nReport each employee's primary department. If they belong to only one department, report that one.",
+    "initial_code": "-- Find primary department for each employee\nSELECT ",
+    "solution_code": "SELECT employee_id, department_id\nFROM Employee\nWHERE primary_flag = 'Y'\nUNION\nSELECT employee_id, department_id\nFROM Employee\nGROUP BY employee_id\nHAVING COUNT(*) = 1;",
+    "context_sql": "CREATE TABLE Employee (employee_id INTEGER, department_id INTEGER, primary_flag TEXT, PRIMARY KEY (employee_id, department_id));\nINSERT INTO Employee VALUES (1,1,'N');\nINSERT INTO Employee VALUES (2,1,'Y');\nINSERT INTO Employee VALUES (2,2,'N');\nINSERT INTO Employee VALUES (3,3,'N');\nINSERT INTO Employee VALUES (4,2,'N');\nINSERT INTO Employee VALUES (4,3,'Y');\nINSERT INTO Employee VALUES (4,4,'N');",
+    "lesson_syntax": "UNION; WHERE flag = 'Y'; GROUP BY HAVING COUNT(*) = 1;",
+    "test_cases": [
+      {
+        "expected_output": "employee_id|department_id\n1|1\n2|1\n3|3\n4|3",
+        "is_hidden": false
+      }
+    ],
+    "module_id": "6",
+    "module_name": "Advanced Queries",
+    "lesson_order": 6,
+    "id": 61
+  },
+  {
+    "leetcode_num": 610,
+    "title": "Triangle Judgement",
+    "difficulty": "Easy",
+    "category": "SQL",
+    "description": "## \ud83c\udfaf Triangle Judgement\n\nTable: **Triangle** (x, y, z) \u2014 PK is (x,y,z)\n\n## \u270f\ufe0f Exercise\n\nReport whether three line segments can form a triangle.",
+    "initial_code": "-- Determine if segments form a triangle\nSELECT ",
+    "solution_code": "SELECT x, y, z,\n  CASE WHEN x + y > z AND x + z > y AND y + z > x THEN 'Yes' ELSE 'No' END AS triangle\nFROM Triangle;",
+    "context_sql": "CREATE TABLE Triangle (x INTEGER, y INTEGER, z INTEGER, PRIMARY KEY (x, y, z));\nINSERT INTO Triangle VALUES (13,15,30);\nINSERT INTO Triangle VALUES (10,20,15);",
+    "lesson_syntax": "CASE WHEN cond1 AND cond2 AND cond3 THEN 'Yes' ELSE 'No' END;",
+    "test_cases": [
+      {
+        "expected_output": "x|y|z|triangle\n13|15|30|No\n10|20|15|Yes",
+        "is_hidden": false
+      }
+    ],
+    "module_id": "7",
+    "module_name": "Conditional Logic & CASE",
+    "lesson_order": 2,
+    "id": 62
+  },
+  {
+    "leetcode_num": 180,
+    "title": "Consecutive Numbers",
+    "difficulty": "Medium",
+    "category": "SQL",
+    "description": "## \ud83c\udfaf Consecutive Numbers\n\nTable: **Logs** (id PK autoincrement, num)\n\n## \u270f\ufe0f Exercise\n\nFind all numbers that appear at least **three times consecutively**.",
+    "initial_code": "-- Find numbers appearing 3+ times consecutively\nSELECT ",
+    "solution_code": "SELECT DISTINCT l1.num AS ConsecutiveNums\nFROM Logs l1\nJOIN Logs l2 ON l1.id = l2.id - 1\nJOIN Logs l3 ON l2.id = l3.id - 1\nWHERE l1.num = l2.num AND l2.num = l3.num;",
+    "context_sql": "CREATE TABLE Logs (id INTEGER PRIMARY KEY, num TEXT);\nINSERT INTO Logs VALUES (1,'1');\nINSERT INTO Logs VALUES (2,'1');\nINSERT INTO Logs VALUES (3,'1');\nINSERT INTO Logs VALUES (4,'2');\nINSERT INTO Logs VALUES (5,'1');\nINSERT INTO Logs VALUES (6,'2');\nINSERT INTO Logs VALUES (7,'2');",
+    "lesson_syntax": "Self-JOIN on consecutive IDs; DISTINCT;",
+    "test_cases": [
+      {
+        "expected_output": "ConsecutiveNums\n1",
+        "is_hidden": false
+      }
+    ],
+    "module_id": "9",
+    "module_name": "Self-JOINs & Advanced Patterns",
+    "lesson_order": 5,
+    "id": 63
+  },
+  {
+    "leetcode_num": 1164,
+    "title": "Product Price at a Given Date",
+    "difficulty": "Medium",
+    "category": "SQL",
+    "description": "## \ud83c\udfaf Product Price at a Given Date\n\nTable: **Products** (product_id, new_price, change_date). PK: (product_id, change_date). Initial price = 10.\n\n## \u270f\ufe0f Exercise\n\nFind the prices of all products on **2019-08-16**.",
+    "initial_code": "-- Find product prices on 2019-08-16\nSELECT ",
+    "solution_code": "SELECT p.product_id,\n       COALESCE(\n         (SELECT new_price FROM Products p2\n          WHERE p2.product_id = p.product_id AND p2.change_date <= '2019-08-16'\n          ORDER BY p2.change_date DESC LIMIT 1),\n         10\n       ) AS price\nFROM (SELECT DISTINCT product_id FROM Products) p;",
+    "context_sql": "CREATE TABLE Products (product_id INTEGER, new_price INTEGER, change_date TEXT, PRIMARY KEY (product_id, change_date));\nINSERT INTO Products VALUES (1,20,'2019-08-14');\nINSERT INTO Products VALUES (2,50,'2019-08-14');\nINSERT INTO Products VALUES (1,30,'2019-08-15');\nINSERT INTO Products VALUES (1,35,'2019-08-16');\nINSERT INTO Products VALUES (2,65,'2019-08-17');\nINSERT INTO Products VALUES (3,20,'2019-08-18');",
+    "lesson_syntax": "Correlated subquery; COALESCE(); ORDER BY ... LIMIT 1;",
+    "test_cases": [
+      {
+        "expected_output": "product_id|price\n1|35\n2|50\n3|10",
+        "is_hidden": false
+      }
+    ],
+    "module_id": "9",
+    "module_name": "Self-JOINs & Advanced Patterns",
+    "lesson_order": 8,
+    "id": 64
+  },
+  {
+    "leetcode_num": 1204,
+    "title": "Last Person to Fit in the Bus",
+    "difficulty": "Medium",
+    "category": "SQL",
+    "description": "## \ud83c\udfaf Last Person to Fit in the Bus\n\nTable: **Queue** (person_id PK, person_name, weight, turn). Bus weight limit = 1000kg.\n\n## \u270f\ufe0f Exercise\n\nFind the person_name of the last person that can fit on the bus without exceeding 1000kg.",
+    "initial_code": "-- Find last person to fit in bus (1000kg limit)\nSELECT ",
+    "solution_code": "SELECT q1.person_name\nFROM Queue q1\nWHERE (SELECT SUM(q2.weight) FROM Queue q2 WHERE q2.turn <= q1.turn) <= 1000\nORDER BY q1.turn DESC\nLIMIT 1;",
+    "context_sql": "CREATE TABLE Queue (person_id INTEGER PRIMARY KEY, person_name TEXT, weight INTEGER, turn INTEGER);\nINSERT INTO Queue VALUES (5,'Alice',250,1);\nINSERT INTO Queue VALUES (4,'Bob',175,5);\nINSERT INTO Queue VALUES (3,'Alex',350,2);\nINSERT INTO Queue VALUES (6,'John Cena',400,3);\nINSERT INTO Queue VALUES (1,'Winston',500,6);\nINSERT INTO Queue VALUES (2,'Marie',200,4);",
+    "lesson_syntax": "Correlated subquery with SUM(); ORDER BY col DESC LIMIT 1;",
+    "test_cases": [
+      {
+        "expected_output": "person_name\nJohn Cena",
+        "is_hidden": false
+      }
+    ],
+    "module_id": "9",
+    "module_name": "Self-JOINs & Advanced Patterns",
+    "lesson_order": 9,
+    "id": 65
+  },
+  {
+    "leetcode_num": 1907,
+    "title": "Count Salary Categories",
+    "difficulty": "Medium",
+    "category": "SQL",
+    "description": "## \ud83c\udfaf Count Salary Categories\n\nTable: **Accounts** (account_id PK, income)\n\nCategories: Low < 20000, Average 20000-50000, High > 50000.\n\n## \u270f\ufe0f Exercise\n\nCount bank accounts in each category. Must return all 3 categories (0 if empty).",
+    "initial_code": "-- Count accounts per salary category\nSELECT ",
+    "solution_code": "SELECT 'Low Salary' AS category,\n       (SELECT COUNT(*) FROM Accounts WHERE income < 20000) AS accounts_count\nUNION ALL\nSELECT 'Average Salary',\n       (SELECT COUNT(*) FROM Accounts WHERE income BETWEEN 20000 AND 50000)\nUNION ALL\nSELECT 'High Salary',\n       (SELECT COUNT(*) FROM Accounts WHERE income > 50000);",
+    "context_sql": "CREATE TABLE Accounts (account_id INTEGER PRIMARY KEY, income INTEGER);\nINSERT INTO Accounts VALUES (3,108939);\nINSERT INTO Accounts VALUES (2,12747);\nINSERT INTO Accounts VALUES (8,87709);\nINSERT INTO Accounts VALUES (6,91796);",
+    "lesson_syntax": "UNION ALL with fixed labels; Subquery counts; BETWEEN;",
+    "test_cases": [
+      {
+        "expected_output": "category|accounts_count\nLow Salary|1\nAverage Salary|0\nHigh Salary|3",
+        "is_hidden": false
+      }
+    ],
+    "module_id": "6",
+    "module_name": "Advanced Queries",
+    "lesson_order": 7,
+    "id": 66
+  },
+  {
+    "leetcode_num": 1978,
+    "title": "Employees Whose Manager Left the Company",
+    "difficulty": "Easy",
+    "category": "SQL",
+    "description": "## \ud83c\udfaf Employees Whose Manager Left the Company\n\nTable: **Employees** (employee_id PK, name, manager_id, salary)\n\n## \u270f\ufe0f Exercise\n\nFind employees with salary < $30000 whose manager left (manager_id not in table). Order by employee_id.",
+    "initial_code": "-- Find employees with departed managers and salary < 30000\nSELECT ",
+    "solution_code": "SELECT employee_id\nFROM Employees\nWHERE salary < 30000\n  AND manager_id IS NOT NULL\n  AND manager_id NOT IN (SELECT employee_id FROM Employees)\nORDER BY employee_id;",
+    "context_sql": "CREATE TABLE Employees (employee_id INTEGER PRIMARY KEY, name TEXT, manager_id INTEGER, salary INTEGER);\nINSERT INTO Employees VALUES (3,'Mila',9,60301);\nINSERT INTO Employees VALUES (12,'Antonella',NULL,31000);\nINSERT INTO Employees VALUES (13,'Emery',NULL,67084);\nINSERT INTO Employees VALUES (1,'Kalel',11,21241);\nINSERT INTO Employees VALUES (9,'Mikaela',NULL,50937);\nINSERT INTO Employees VALUES (11,'Joziah',6,28485);",
+    "lesson_syntax": "NOT IN (subquery); IS NOT NULL; ORDER BY col;",
+    "test_cases": [
+      {
+        "expected_output": "employee_id\n11",
+        "is_hidden": false
+      }
+    ],
+    "module_id": "6",
+    "module_name": "Advanced Queries",
+    "lesson_order": 4,
+    "id": 67
+  },
+  {
+    "leetcode_num": 626,
+    "title": "Exchange Seats",
+    "difficulty": "Medium",
+    "category": "SQL",
+    "description": "## \ud83c\udfaf Exchange Seats\n\nTable: **Seat** (id PK, student)\n\n## \u270f\ufe0f Exercise\n\nSwap the seat id of every two consecutive students. If odd count, last student keeps their id. Order by id ASC.",
+    "initial_code": "-- Swap consecutive seat IDs\nSELECT ",
+    "solution_code": "SELECT\n  CASE\n    WHEN id % 2 = 1 AND id = (SELECT MAX(id) FROM Seat) THEN id\n    WHEN id % 2 = 1 THEN id + 1\n    ELSE id - 1\n  END AS id,\n  student\nFROM Seat\nORDER BY id;",
+    "context_sql": "CREATE TABLE Seat (id INTEGER PRIMARY KEY, student TEXT);\nINSERT INTO Seat VALUES (1,'Abbot');\nINSERT INTO Seat VALUES (2,'Doris');\nINSERT INTO Seat VALUES (3,'Emerson');\nINSERT INTO Seat VALUES (4,'Green');\nINSERT INTO Seat VALUES (5,'Jeames');",
+    "lesson_syntax": "CASE WHEN id % 2 = 1 THEN ... ELSE ... END; Subquery MAX(id);",
+    "test_cases": [
+      {
+        "expected_output": "id|student\n1|Doris\n2|Abbot\n3|Green\n4|Emerson\n5|Jeames",
+        "is_hidden": false
+      }
+    ],
+    "module_id": "7",
+    "module_name": "Conditional Logic & CASE",
+    "lesson_order": 6,
+    "id": 68
+  },
+  {
+    "leetcode_num": 1341,
+    "title": "Movie Rating",
+    "difficulty": "Medium",
+    "category": "SQL",
+    "description": "## \ud83c\udfaf Movie Rating\n\nTable: **Movies** (movie_id PK, title)\nTable: **Users** (user_id PK, name)\nTable: **MovieRating** (movie_id, user_id) \u2014 composite PK, plus rating and created_at\n\n## \u270f\ufe0f Exercise\n\n1. Find user who rated the most movies (ties: lexicographically smaller name)\n2. Find movie with highest avg rating in Feb 2020 (ties: lexicographically smaller title)\n\nReturn as single column 'results'.",
+    "initial_code": "-- Find top rater and top-rated Feb 2020 movie\nSELECT ",
+    "solution_code": "SELECT name AS results FROM (\n  SELECT u.name, COUNT(*) AS cnt\n  FROM MovieRating mr JOIN Users u ON mr.user_id = u.user_id\n  GROUP BY u.name\n  ORDER BY cnt DESC, u.name ASC LIMIT 1\n)\nUNION ALL\nSELECT title AS results FROM (\n  SELECT m.title, AVG(mr.rating) AS avg_r\n  FROM MovieRating mr JOIN Movies m ON mr.movie_id = m.movie_id\n  WHERE mr.created_at LIKE '2020-02%'\n  GROUP BY m.title\n  ORDER BY avg_r DESC, m.title ASC LIMIT 1\n);",
+    "context_sql": "CREATE TABLE Movies (movie_id INTEGER PRIMARY KEY, title TEXT);\nCREATE TABLE Users (user_id INTEGER PRIMARY KEY, name TEXT);\nCREATE TABLE MovieRating (movie_id INTEGER, user_id INTEGER, rating INTEGER, created_at TEXT, PRIMARY KEY (movie_id, user_id));\nINSERT INTO Movies VALUES (1,'Avengers');\nINSERT INTO Movies VALUES (2,'Frozen 2');\nINSERT INTO Movies VALUES (3,'Joker');\nINSERT INTO Users VALUES (1,'Daniel');\nINSERT INTO Users VALUES (2,'Monica');\nINSERT INTO Users VALUES (3,'Maria');\nINSERT INTO Users VALUES (4,'James');\nINSERT INTO MovieRating VALUES (1,1,3,'2020-01-12');\nINSERT INTO MovieRating VALUES (1,2,4,'2020-02-11');\nINSERT INTO MovieRating VALUES (1,3,2,'2020-02-12');\nINSERT INTO MovieRating VALUES (1,4,1,'2020-01-01');\nINSERT INTO MovieRating VALUES (2,1,5,'2020-02-17');\nINSERT INTO MovieRating VALUES (2,2,2,'2020-02-01');\nINSERT INTO MovieRating VALUES (2,3,2,'2020-03-01');\nINSERT INTO MovieRating VALUES (3,1,3,'2020-02-22');\nINSERT INTO MovieRating VALUES (3,2,4,'2020-02-25');",
+    "lesson_syntax": "UNION ALL; Subqueries with ORDER BY + LIMIT 1; LIKE for date patterns;",
+    "test_cases": [
+      {
+        "expected_output": "results\nDaniel\nFrozen 2",
+        "is_hidden": false
+      }
+    ],
+    "module_id": "10",
+    "module_name": "Real-World Query Challenges",
+    "lesson_order": 6,
+    "id": 69
+  },
+  {
+    "leetcode_num": 1321,
+    "title": "Restaurant Growth",
+    "difficulty": "Medium",
+    "category": "SQL",
+    "description": "## \ud83c\udfaf Restaurant Growth\n\nTable: **Customer** (customer_id, name, visited_on, amount). PK: (customer_id, visited_on).\n\n## \u270f\ufe0f Exercise\n\nCompute the 7-day moving average of customer payments (current day + 6 days before). Round average_amount to 2 decimal places. Order by visited_on ASC.",
+    "initial_code": "-- 7-day moving average of payments\nSELECT ",
+    "solution_code": "SELECT DISTINCT c1.visited_on,\n       (SELECT SUM(c2.amount) FROM Customer c2\n        WHERE c2.visited_on BETWEEN DATE(c1.visited_on, '-6 days') AND c1.visited_on) AS amount,\n       ROUND((SELECT SUM(c2.amount) * 1.0 / 7 FROM Customer c2\n              WHERE c2.visited_on BETWEEN DATE(c1.visited_on, '-6 days') AND c1.visited_on), 2) AS average_amount\nFROM Customer c1\nWHERE c1.visited_on >= (SELECT DATE(MIN(visited_on), '+6 days') FROM Customer)\nORDER BY c1.visited_on;",
+    "context_sql": "CREATE TABLE Customer (customer_id INTEGER, name TEXT, visited_on TEXT, amount INTEGER, PRIMARY KEY (customer_id, visited_on));\nINSERT INTO Customer VALUES (1,'Jhon','2019-01-01',100);\nINSERT INTO Customer VALUES (2,'Daniel','2019-01-02',110);\nINSERT INTO Customer VALUES (3,'Jade','2019-01-03',120);\nINSERT INTO Customer VALUES (4,'Khaled','2019-01-04',130);\nINSERT INTO Customer VALUES (5,'Winston','2019-01-05',110);\nINSERT INTO Customer VALUES (6,'Elvis','2019-01-06',140);\nINSERT INTO Customer VALUES (7,'Anna','2019-01-07',150);\nINSERT INTO Customer VALUES (8,'Maria','2019-01-08',80);\nINSERT INTO Customer VALUES (9,'Jaze','2019-01-09',110);\nINSERT INTO Customer VALUES (1,'Jhon','2019-01-10',130);\nINSERT INTO Customer VALUES (3,'Jade','2019-01-10',150);",
+    "lesson_syntax": "Correlated subquery; DATE(col, '-N days'); BETWEEN; Moving average pattern;",
+    "test_cases": [
+      {
+        "expected_output": "visited_on|amount|average_amount\n2019-01-07|860|122.86\n2019-01-08|840|120.0\n2019-01-09|840|120.0\n2019-01-10|1000|142.86",
+        "is_hidden": false
+      }
+    ],
+    "module_id": "10",
+    "module_name": "Real-World Query Challenges",
+    "lesson_order": 7,
+    "id": 70
+  },
+  {
+    "leetcode_num": 602,
+    "title": "Friend Requests II: Who Has the Most Friends",
+    "difficulty": "Medium",
+    "category": "SQL",
+    "description": "## \ud83c\udfaf Friend Requests II: Who Has the Most Friends\n\nTable: **RequestAccepted** (requester_id, accepter_id, accept_date). PK: (requester_id, accepter_id).\n\n## \u270f\ufe0f Exercise\n\nFind the person with the most friends and their friend count. Friends include both sent and received requests.",
+    "initial_code": "-- Find person with most friends\nSELECT ",
+    "solution_code": "SELECT id, COUNT(*) AS num\nFROM (\n  SELECT requester_id AS id FROM RequestAccepted\n  UNION ALL\n  SELECT accepter_id AS id FROM RequestAccepted\n)\nGROUP BY id\nORDER BY num DESC\nLIMIT 1;",
+    "context_sql": "CREATE TABLE RequestAccepted (requester_id INTEGER, accepter_id INTEGER, accept_date TEXT, PRIMARY KEY (requester_id, accepter_id));\nINSERT INTO RequestAccepted VALUES (1,2,'2016-06-03');\nINSERT INTO RequestAccepted VALUES (1,3,'2016-06-08');\nINSERT INTO RequestAccepted VALUES (2,3,'2016-06-08');\nINSERT INTO RequestAccepted VALUES (3,4,'2016-06-09');",
+    "lesson_syntax": "UNION ALL to combine directional relationships; GROUP BY + ORDER BY + LIMIT;",
+    "test_cases": [
+      {
+        "expected_output": "id|num\n3|3",
+        "is_hidden": false
+      }
+    ],
+    "module_id": "9",
+    "module_name": "Self-JOINs & Advanced Patterns",
+    "lesson_order": 7,
+    "id": 71
+  },
+  {
+    "leetcode_num": 585,
+    "title": "Investments in 2016",
+    "difficulty": "Medium",
+    "category": "SQL",
+    "description": "## \ud83c\udfaf Investments in 2016\n\nTable: **Insurance** (pid PK, tiv_2015, tiv_2016, lat, lon)\n\n## \u270f\ufe0f Exercise\n\nReport the sum of tiv_2016 (rounded to 2 decimals) for policyholders who have the same tiv_2015 value as at least one other policyholder AND are in a unique (lat, lon) location.",
+    "initial_code": "-- Sum of tiv_2016 with conditions\nSELECT ",
+    "solution_code": "SELECT ROUND(SUM(tiv_2016), 2) AS tiv_2016\nFROM Insurance\nWHERE tiv_2015 IN (\n  SELECT tiv_2015 FROM Insurance GROUP BY tiv_2015 HAVING COUNT(*) > 1\n)\nAND (lat, lon) IN (\n  SELECT lat, lon FROM Insurance GROUP BY lat, lon HAVING COUNT(*) = 1\n);",
+    "context_sql": "CREATE TABLE Insurance (pid INTEGER PRIMARY KEY, tiv_2015 REAL, tiv_2016 REAL, lat REAL, lon REAL);\nINSERT INTO Insurance VALUES (1,10,5,10,10);\nINSERT INTO Insurance VALUES (2,20,20,20,20);\nINSERT INTO Insurance VALUES (3,10,30,20,20);\nINSERT INTO Insurance VALUES (4,10,40,40,40);",
+    "lesson_syntax": "IN (subquery); HAVING COUNT(*) > 1; Tuple comparison (col1, col2) IN (...);",
+    "test_cases": [
+      {
+        "expected_output": "tiv_2016\n45.0",
+        "is_hidden": false
+      }
+    ],
+    "module_id": "10",
+    "module_name": "Real-World Query Challenges",
+    "lesson_order": 8,
+    "id": 72
+  },
+  {
+    "leetcode_num": 185,
+    "title": "Department Top Three Salaries",
+    "difficulty": "Hard",
+    "category": "SQL",
+    "description": "## \ud83c\udfaf Department Top Three Salaries\n\nTable: **Employee** (id PK, name, salary, departmentId FK)\nTable: **Department** (id PK, name)\n\n## \u270f\ufe0f Exercise\n\nA high earner has a salary in the top 3 unique salaries for their department. Find all high earners.",
+    "initial_code": "-- Find top 3 earners per department\nSELECT ",
+    "solution_code": "SELECT d.name AS Department, e.name AS Employee, e.salary AS Salary\nFROM Employee e\nJOIN Department d ON e.departmentId = d.id\nWHERE (\n  SELECT COUNT(DISTINCT e2.salary)\n  FROM Employee e2\n  WHERE e2.departmentId = e.departmentId AND e2.salary > e.salary\n) < 3;",
+    "context_sql": "CREATE TABLE Department (id INTEGER PRIMARY KEY, name TEXT);\nCREATE TABLE Employee (id INTEGER PRIMARY KEY, name TEXT, salary INTEGER, departmentId INTEGER);\nINSERT INTO Department VALUES (1,'IT');\nINSERT INTO Department VALUES (2,'Sales');\nINSERT INTO Employee VALUES (1,'Joe',85000,1);\nINSERT INTO Employee VALUES (2,'Henry',80000,2);\nINSERT INTO Employee VALUES (3,'Sam',60000,2);\nINSERT INTO Employee VALUES (4,'Max',90000,1);\nINSERT INTO Employee VALUES (5,'Janet',69000,1);\nINSERT INTO Employee VALUES (6,'Randy',85000,1);\nINSERT INTO Employee VALUES (7,'Will',70000,1);",
+    "lesson_syntax": "Correlated subquery with COUNT(DISTINCT); Top-N per group pattern;",
+    "test_cases": [
+      {
+        "expected_output": "Department|Employee|Salary\nIT|Max|90000\nIT|Joe|85000\nIT|Randy|85000\nIT|Will|70000\nSales|Henry|80000\nSales|Sam|60000",
+        "is_hidden": false
+      }
+    ],
+    "module_id": "10",
+    "module_name": "Real-World Query Challenges",
+    "lesson_order": 10,
+    "id": 73
+  },
+  {
+    "leetcode_num": 1667,
+    "title": "Fix Names in a Table",
+    "difficulty": "Easy",
+    "category": "SQL",
+    "description": "## \ud83c\udfaf Fix Names in a Table\n\nTable: **Users** (user_id PK, name)\n\n## \u270f\ufe0f Exercise\n\nFix the names so only the first letter is uppercase and the rest are lowercase. Order by user_id.",
+    "initial_code": "-- Fix capitalization of names\nSELECT ",
+    "solution_code": "SELECT user_id,\n       UPPER(SUBSTR(name, 1, 1)) || LOWER(SUBSTR(name, 2)) AS name\nFROM Users\nORDER BY user_id;",
+    "context_sql": "CREATE TABLE Users (user_id INTEGER PRIMARY KEY, name TEXT);\nINSERT INTO Users VALUES (1,'aLice');\nINSERT INTO Users VALUES (2,'bOB');",
+    "lesson_syntax": "UPPER(); LOWER(); SUBSTR(col, start, len); || for concatenation;",
+    "test_cases": [
+      {
+        "expected_output": "user_id|name\n1|Alice\n2|Bob",
+        "is_hidden": false
+      }
+    ],
+    "module_id": "8",
+    "module_name": "String & Date Functions",
+    "lesson_order": 4,
+    "id": 74
+  },
+  {
+    "leetcode_num": 1517,
+    "title": "Find Users With Valid E-Mails",
+    "difficulty": "Easy",
+    "category": "SQL",
+    "description": "## \ud83c\udfaf Find Users With Valid E-Mails\n\nTable: **Users** (user_id PK, name, mail)\n\nValid email: starts with a letter, may contain letters/digits/underscore/period/dash, ends with @leetcode.com.\n\n## \u270f\ufe0f Exercise\n\nFind users with valid emails.",
+    "initial_code": "-- Find users with valid emails\nSELECT ",
+    "solution_code": "SELECT *\nFROM Users\nWHERE mail LIKE '%@leetcode.com'\n  AND SUBSTR(mail, 1, INSTR(mail, '@') - 1) GLOB '[A-Za-z]*'\n  AND SUBSTR(mail, 1, INSTR(mail, '@') - 1) NOT GLOB '*[^A-Za-z0-9._-]*';",
+    "context_sql": "CREATE TABLE Users (user_id INTEGER PRIMARY KEY, name TEXT, mail TEXT);\nINSERT INTO Users VALUES (1,'Winston','winston@leetcode.com');\nINSERT INTO Users VALUES (2,'Jonathan','jonathanisgreat');\nINSERT INTO Users VALUES (3,'Annabelle','bella@leetcode.com');\nINSERT INTO Users VALUES (4,'Sally','sally.come@leetcode.com');\nINSERT INTO Users VALUES (5,'Marwan','quarz#2020@leetcode.com');\nINSERT INTO Users VALUES (6,'David','david69@gmail.com');\nINSERT INTO Users VALUES (7,'Shapiro','.teleShapiro@leetcode.com');",
+    "lesson_syntax": "LIKE; GLOB pattern matching; INSTR(); SUBSTR();",
+    "test_cases": [
+      {
+        "expected_output": "user_id|name|mail\n1|Winston|winston@leetcode.com\n3|Annabelle|bella@leetcode.com\n4|Sally|sally.come@leetcode.com",
+        "is_hidden": false
+      }
+    ],
+    "module_id": "8",
+    "module_name": "String & Date Functions",
+    "lesson_order": 5,
+    "id": 75
+  },
+  {
+    "leetcode_num": 176,
+    "title": "Second Highest Salary",
+    "difficulty": "Medium",
+    "category": "SQL",
+    "description": "## \ud83c\udfaf Second Highest Salary\n\nTable: **Employee** (id PK, salary)\n\n## \u270f\ufe0f Exercise\n\nFind the second highest distinct salary. If none, return null.",
+    "initial_code": "-- Find second highest salary\nSELECT ",
+    "solution_code": "SELECT MAX(salary) AS SecondHighestSalary\nFROM Employee\nWHERE salary < (SELECT MAX(salary) FROM Employee);",
+    "context_sql": "CREATE TABLE Employee (id INTEGER PRIMARY KEY, salary INTEGER);\nINSERT INTO Employee VALUES (1,100);\nINSERT INTO Employee VALUES (2,200);\nINSERT INTO Employee VALUES (3,300);",
+    "lesson_syntax": "MAX(col) with WHERE col < (subquery MAX); Returns NULL if no rows;",
+    "test_cases": [
+      {
+        "expected_output": "SecondHighestSalary\n200",
+        "is_hidden": false
+      }
+    ],
+    "module_id": "6",
+    "module_name": "Advanced Queries",
+    "lesson_order": 3,
+    "id": 76
+  },
+  {
+    "leetcode_num": 1484,
+    "title": "Group Sold Products By The Date",
+    "difficulty": "Easy",
+    "category": "SQL",
+    "description": "## \ud83c\udfaf Group Sold Products By The Date\n\nTable: **Activities** (sell_date, product) \u2014 no PK, may have duplicates\n\n## \u270f\ufe0f Exercise\n\nFor each date, find the number of distinct products sold and their names (comma-separated, lexicographically sorted).",
+    "initial_code": "-- Group products sold by date\nSELECT ",
+    "solution_code": "SELECT sell_date,\n       COUNT(DISTINCT product) AS num_sold,\n       GROUP_CONCAT(DISTINCT product) AS products\nFROM Activities\nGROUP BY sell_date\nORDER BY sell_date;",
+    "context_sql": "CREATE TABLE Activities (sell_date TEXT, product TEXT);\nINSERT INTO Activities VALUES ('2020-05-30','Headphone');\nINSERT INTO Activities VALUES ('2020-06-01','Pencil');\nINSERT INTO Activities VALUES ('2020-06-02','Mask');\nINSERT INTO Activities VALUES ('2020-05-30','Basketball');\nINSERT INTO Activities VALUES ('2020-06-01','Bible');\nINSERT INTO Activities VALUES ('2020-06-02','Mask');\nINSERT INTO Activities VALUES ('2020-05-30','T-shirt');",
+    "lesson_syntax": "GROUP_CONCAT(DISTINCT col); COUNT(DISTINCT col); GROUP BY date;",
+    "test_cases": [
+      {
+        "expected_output": "sell_date|num_sold|products\n2020-05-30|3|Basketball,Headphone,T-shirt\n2020-06-01|2|Bible,Pencil\n2020-06-02|1|Mask",
+        "is_hidden": false
+      }
+    ],
+    "module_id": "8",
+    "module_name": "String & Date Functions",
+    "lesson_order": 8,
+    "id": 77
+  },
+  {
+    "leetcode_num": 1327,
+    "title": "List the Products Ordered in a Period",
+    "difficulty": "Easy",
+    "category": "SQL",
+    "description": "## \ud83c\udfaf List the Products Ordered in a Period\n\nTable: **Products** (product_id PK, product_name, product_category)\nTable: **Orders** (product_id FK, order_date, unit)\n\n## \u270f\ufe0f Exercise\n\nFind products that have at least 100 units ordered in **February 2020**.",
+    "initial_code": "-- Products with >= 100 units ordered in Feb 2020\nSELECT ",
+    "solution_code": "SELECT p.product_name, SUM(o.unit) AS unit\nFROM Products p\nJOIN Orders o ON p.product_id = o.product_id\nWHERE o.order_date LIKE '2020-02%'\nGROUP BY p.product_name\nHAVING SUM(o.unit) >= 100;",
+    "context_sql": "CREATE TABLE Products (product_id INTEGER PRIMARY KEY, product_name TEXT, product_category TEXT);\nCREATE TABLE Orders (product_id INTEGER, order_date TEXT, unit INTEGER);\nINSERT INTO Products VALUES (1,'Leetcode Solutions','Book');\nINSERT INTO Products VALUES (2,'Jewels of Stringology','Book');\nINSERT INTO Products VALUES (3,'HP','Laptop');\nINSERT INTO Products VALUES (4,'Lenovo','Laptop');\nINSERT INTO Products VALUES (5,'Leetcode Kit','T-shirt');\nINSERT INTO Orders VALUES (1,'2020-02-05',60);\nINSERT INTO Orders VALUES (1,'2020-02-10',70);\nINSERT INTO Orders VALUES (2,'2020-01-18',30);\nINSERT INTO Orders VALUES (2,'2020-02-11',80);\nINSERT INTO Orders VALUES (3,'2020-02-17',2);\nINSERT INTO Orders VALUES (3,'2020-02-24',3);\nINSERT INTO Orders VALUES (4,'2020-03-01',20);\nINSERT INTO Orders VALUES (4,'2020-03-04',30);\nINSERT INTO Orders VALUES (4,'2020-03-04',60);\nINSERT INTO Orders VALUES (5,'2020-02-25',50);\nINSERT INTO Orders VALUES (5,'2020-02-27',50);\nINSERT INTO Orders VALUES (5,'2020-03-01',50);",
+    "lesson_syntax": "LIKE for date filtering; JOIN + GROUP BY + HAVING SUM() >= n;",
+    "test_cases": [
+      {
+        "expected_output": "product_name|unit\nLeetcode Solutions|130\nLeetcode Kit|100",
+        "is_hidden": false
+      }
+    ],
+    "module_id": "8",
+    "module_name": "String & Date Functions",
+    "lesson_order": 9,
+    "id": 78
+  },
+  {
+    "leetcode_num": 1158,
+    "title": "Market Analysis I",
+    "difficulty": "Medium",
+    "category": "SQL",
+    "description": "## \ud83c\udfaf Market Analysis I\n\nTable: **Users** (user_id PK, join_date, favorite_brand)\nTable: **Orders** (order_id PK, order_date, item_id, buyer_id FK, seller_id FK)\nTable: **Items** (item_id PK, item_brand)\n\n## \u270f\ufe0f Exercise\n\nFind each user's join_date and number of orders they made as a buyer in **2019**.",
+    "initial_code": "-- Count 2019 orders per buyer\nSELECT ",
+    "solution_code": "SELECT u.user_id AS buyer_id, u.join_date,\n       COUNT(o.order_id) AS orders_in_2019\nFROM Users u\nLEFT JOIN Orders o ON u.user_id = o.buyer_id AND o.order_date LIKE '2019%'\nGROUP BY u.user_id, u.join_date;",
+    "context_sql": "CREATE TABLE Users (user_id INTEGER PRIMARY KEY, join_date TEXT, favorite_brand TEXT);\nCREATE TABLE Orders (order_id INTEGER PRIMARY KEY, order_date TEXT, item_id INTEGER, buyer_id INTEGER, seller_id INTEGER);\nCREATE TABLE Items (item_id INTEGER PRIMARY KEY, item_brand TEXT);\nINSERT INTO Users VALUES (1,'2018-01-01','Lenovo');\nINSERT INTO Users VALUES (2,'2018-02-09','Samsung');\nINSERT INTO Users VALUES (3,'2018-01-19','LG');\nINSERT INTO Users VALUES (4,'2018-05-21','HP');\nINSERT INTO Orders VALUES (1,'2019-08-01',4,1,2);\nINSERT INTO Orders VALUES (2,'2018-08-02',2,1,3);\nINSERT INTO Orders VALUES (3,'2019-08-03',3,2,3);\nINSERT INTO Orders VALUES (4,'2018-08-04',1,4,2);\nINSERT INTO Orders VALUES (5,'2018-08-04',1,3,4);\nINSERT INTO Orders VALUES (6,'2019-08-05',2,2,4);\nINSERT INTO Items VALUES (1,'Samsung');\nINSERT INTO Items VALUES (2,'Lenovo');\nINSERT INTO Items VALUES (3,'LG');\nINSERT INTO Items VALUES (4,'HP');",
+    "lesson_syntax": "LEFT JOIN with condition in ON clause; COUNT(col) vs COUNT(*); LIKE for year filter;",
+    "test_cases": [
+      {
+        "expected_output": "buyer_id|join_date|orders_in_2019\n1|2018-01-01|1\n2|2018-02-09|2\n3|2018-01-19|0\n4|2018-05-21|0",
+        "is_hidden": false
+      }
+    ],
+    "module_id": "10",
+    "module_name": "Real-World Query Challenges",
+    "lesson_order": 9,
+    "id": 79
+  },
+  {
+    "leetcode_num": 1683,
+    "title": "Consecutive Available Seats",
+    "difficulty": "Easy",
+    "category": "SQL",
+    "description": "## \ud83c\udfaf Consecutive Available Seats\n\nTable: **Cinema** (seat_id PK auto-increment, free boolean)\n\n(Note: this is a different problem from the earlier Invalid Tweets #1683 \u2014 LeetCode reuses numbers across plans)\n\n## \u270f\ufe0f Exercise\n\nFind all seat IDs that are free AND have at least one adjacent free seat. Order by seat_id ASC.",
+    "initial_code": "-- Find consecutive free seats\nSELECT ",
+    "solution_code": "SELECT DISTINCT c1.seat_id\nFROM Cinema c1\nJOIN Cinema c2\n  ON ABS(c1.seat_id - c2.seat_id) = 1\nWHERE c1.free = 1 AND c2.free = 1\nORDER BY c1.seat_id;",
+    "context_sql": "CREATE TABLE Cinema (seat_id INTEGER PRIMARY KEY, free INTEGER);\nINSERT INTO Cinema VALUES (1,1);\nINSERT INTO Cinema VALUES (2,0);\nINSERT INTO Cinema VALUES (3,1);\nINSERT INTO Cinema VALUES (4,1);\nINSERT INTO Cinema VALUES (5,1);",
+    "lesson_syntax": "Self-JOIN on ABS(id1 - id2) = 1; DISTINCT; WHERE conditions on both tables;",
+    "test_cases": [
+      {
+        "expected_output": "seat_id\n3\n4\n5",
+        "is_hidden": false
+      }
+    ],
+    "module_id": "9",
+    "module_name": "Self-JOINs & Advanced Patterns",
+    "lesson_order": 6,
+    "id": 80
+  }
+]
